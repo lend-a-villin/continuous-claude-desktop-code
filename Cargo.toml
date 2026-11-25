@@ -1,0 +1,78 @@
+[package]
+name = "ccdc"
+version = "1.0.0"
+edition = "2021"
+description = "Keeps Claude desktop Code sessions available to every account that signs in on a shared computer"
+license = "MIT"
+repository = "https://github.com/lend-a-villin/continuous-claude-desktop-code"
+homepage = "https://github.com/lend-a-villin/continuous-claude-desktop-code"
+authors = ["Villin"]
+readme = "README.md"
+build = "build.rs"
+
+[[bin]]
+name = "ccdc"
+path = "src/main.rs"
+
+# Each platform has its own version: Windows continues from the 0.3.0 scripts,
+# macOS and Linux are new. build.rs puts the right one into the program
+# (`ccdc version`), and the packaging scripts name the files with it.
+[package.metadata.ccdc]
+windows = "1.0.0"
+macos = "0.1.0"
+linux = "0.1.0"
+
+[dependencies]
+serde_json = { version = "1", features = ["preserve_order"] }
+tray-icon = "0.27"
+tao = "0.38"
+rfd = { version = "0.18", default-features = false, features = ["gtk3"] }
+notify-rust = "4"
+
+[target.'cfg(windows)'.dependencies]
+winreg = "0.56"
+windows-sys = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Globalization",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Console",
+    "Win32_System_Threading",
+    "Win32_System_SystemInformation",
+    "Win32_Security",
+] }
+
+[target.'cfg(not(windows))'.dependencies]
+libc = "0.2"
+sys-locale = "0.3"
+
+[build-dependencies]
+winresource = "0.1"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+# Debian/Ubuntu/Mint package: cargo deb
+[package.metadata.deb]
+name = "ccdc"
+maintainer = "Villin"
+copyright = "2026, Villin"
+section = "utils"
+priority = "optional"
+depends = "$auto, libayatana-appindicator3-1 | libappindicator3-1"
+extended-description = """\
+Tray app that keeps the local Code sessions of the Claude desktop app \
+available to whichever Claude account signs in on a shared computer, \
+such as a workplace that runs 24 hours in three shifts. \
+Unofficial; not affiliated with or endorsed by Anthropic."""
+assets = [
+    ["target/release/ccdc", "usr/bin/", "755"],
+    ["packaging/linux/ccdc.desktop", "usr/share/applications/", "644"],
+    ["target/icons/ccdc-256.png", "usr/share/icons/hicolor/256x256/apps/ccdc.png", "644"],
+    ["target/icons/ccdc-64.png", "usr/share/icons/hicolor/64x64/apps/ccdc.png", "644"],
+    ["target/icons/ccdc-32.png", "usr/share/icons/hicolor/32x32/apps/ccdc.png", "644"],
+    ["LICENSE", "usr/share/doc/ccdc/copyright", "644"],
+]

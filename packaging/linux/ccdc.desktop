@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Continuous Claude Desktop Code
+GenericName=CCDC
+Comment=Keeps Claude desktop Code sessions available across accounts on a shared computer
+Exec=ccdc
+Icon=ccdc
+Terminal=false
+Categories=Utility;
+StartupNotify=false

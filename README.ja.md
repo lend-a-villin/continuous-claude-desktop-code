@@ -2,29 +2,48 @@
 
 [English](README.md) | [한국어](README.ko.md) | **日本語** | [简体中文](README.zh-Hans.md) | [繁體中文](README.zh-Hant.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Українська](README.uk.md) | [Polski](README.pl.md) | [Nederlands](README.nl.md) | [Türkçe](README.tr.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [ไทย](README.th.md) | [العربية](README.ar.md) | [हिन्दी](README.hi.md)
 
-この PC でどの Claude アカウントでサインインしても、Claude デスクトップアプリのローカル **Code** セッションを引き続き使えるようにする Windows 用のトレイアプリです。
+Claude のアカウントを切り替えても、Claude デスクトップアプリの **Code** セッションを引き続き使えるようにするトレイアプリです。
+
+Claude デスクトップアプリは、アカウント・組織ごとに別々の Code セッション一覧を持っています。そのため別のアカウントでサインインすると、会話はコンピューターに残っているのに一覧は空に見えます。CCDC はセッションをアカウント間でコピーするので、次にどのアカウントでサインインしても、すべてのセッションが表示されます。
 
 非公式ツールです。Anthropic とは関係がなく、Anthropic の承認を受けたものでもありません。
 
+**[最新リリースをダウンロード](../../releases/latest)** · Windows 10/11 · macOS 11 以降 · Ubuntu/Debian/Linux Mint · 追加のインストールは不要
+
+| プラットフォーム | バージョン | 状態 |
+| --- | --- | --- |
+| Windows | 1.0 | 日常的に使われています (0.3 のスクリプト版の後継です) |
+| macOS | 0.1 | 新しい版です。Mac 上の実際の Claude アプリではまだテストしていません |
+| Linux | 0.1 | 新しい版です。Debian 12、Ubuntu 24.04、Linux Mint 22 でインストールを確認済みですが、実際の Claude アプリではまだテストしていません |
+
 ## 対象
 
-CCDC は **24 時間 3 交代制の職場**のために作られました。交代ごとに別の人が同じ席 (1 台の PC、1 人の Windows ユーザー) に座り、それぞれ自分の Claude アカウントで Claude デスクトップアプリにサインインする環境での利用を想定しています。CCDC を使うと、次の勤務の人がサインインして、前の勤務の人が Code で進めていた作業をそのまま引き継げます。
+- **共用のコンピューターと交代勤務。** 24 時間 3 交代制の職場では、交代ごとに別の人が同じ席 (1 台のコンピューター、1 人のシステムユーザー) に座り、それぞれ自分の Claude アカウントでサインインします。CCDC を使うと、次の勤務の人が、前の勤務の人が Code で進めていた作業をそのまま引き継げます。
+- **1 人で複数のアカウントを使う場合。** 同じコンピューターで個人用と仕事用のアカウントや、複数の組織を切り替えて使っていても、どのアカウントでサインインしても Code セッションがそろっています。
 
-つまり、この PC のすべての Code セッションは、サインインした人なら誰でも見ることができます。互いのセッションを見てはいけない環境では使わないでください。会社 (組織) アカウントの場合は、社内ポリシーも確認してください。
+このコンピューターのすべての Code セッションは、ここでサインインするすべてのアカウントから見えるようになります。互いのセッションを見てはいけない環境では CCDC を使わないでください。会社 (組織) アカウントを使う場合は、先に社内ポリシーを確認してください。CCDC は仕事用アカウントのセッションを個人用アカウントのフォルダーにもコピーし、その逆も行います。
 
 ## なぜ必要か
 
 デスクトップアプリは Code セッションの**一覧**を、アカウント・組織ごとに別のフォルダーに保存します:
 
 ```
-%LOCALAPPDATA%\Claude-Data\claude_<pkg>\claude-code-sessions\<accountUuid>\<orgUuid>\local_<id>.json
+<Claude data folder>/claude-code-sessions/<accountUuid>/<orgUuid>/local_<id>.json
 ```
 
-**会話**そのものは `~/.claude/projects\...\<cliSessionId>.jsonl` にあり、すべてのアカウントで共有されています。そのため、別のアカウントでサインインすると、会話はディスクに残っているのに Code セッションの一覧が空に見えます。
+| | Claude のデータフォルダー | Claude のログ |
+| --- | --- | --- |
+| Windows | `%LOCALAPPDATA%\Claude-Data\claude_<pkg>` (または `%APPDATA%\Claude`) | `%LOCALAPPDATA%\Claude\Logs\main.log` |
+| macOS | `~/Library/Application Support/Claude` | `~/Library/Logs/Claude/main.log` |
+| Linux | `~/.config/Claude` | `~/.config/Claude/logs/main.log` |
+
+(自社のクラウドプロバイダー経由で Claude を利用している組織では、`Claude` の代わりに `Claude-3p` が使われます。CCDC はこちらも探します。)
+
+**会話**そのものは `~/.claude/projects/.../<cliSessionId>.jsonl` にあり、すべてのアカウントで共有されています。そのため、別のアカウントでサインインすると、会話はディスクに残っているのに Code セッションの一覧が空に見えます。
 
 ## しくみ
 
-アプリがセッションフォルダーを読むのは**起動時とサインイン時だけ**です (サインイン時は約 2 秒の間に 2 回)。あとから一覧だけを読み直させる方法はありません。サインアウトとサインインは、どちらもアプリのログ `%LOCALAPPDATA%\Claude\Logs\main.log` に次のように記録されます:
+アプリがセッションフォルダーを読むのは**起動時とサインイン時だけ**です (サインイン時は約 2 秒の間に 2 回)。あとから一覧だけを読み直させる方法はありません。サインアウトとサインインは、どちらもアプリ自身のログに記録されます:
 
 - サインアウト: `[account] Login-state transition (loggedOut: false → true ...)`
 - サインイン: `[LocalSessionManager] Initialization succeeded — accountId=…, orgId=…`
@@ -51,33 +70,48 @@ CCDC はコピーの前にディスクの空き容量を確認します。コピ
 
 すべてのアカウントフォルダーが 1 つの実フォルダーを指すようにすればコピーは不要になりますが、Claude アプリはどちらの方法も意図的にブロックしています:
 
-- **ジャンクション・シンボリックリンク**: アプリは保存の前に毎回、セッションフォルダーが実フォルダーであることを確認し、リンクだった場合は保存を拒否します (`Refusing non-directory at private dir path (symlink/file plant)`)。実際のアプリで試したところ、ジャンクション経由で一覧は読めましたが、新しいセッションを含め、セッションと予約タスクの保存はすべて失敗しました。
+- **ジャンクション・シンボリックリンク**: アプリは保存の前に毎回、セッションフォルダーが実フォルダーであることを確認し、リンクだった場合は保存を拒否します (`Refusing non-directory at private dir path (symlink/file plant)`)。実際のアプリで試したところ、ジャンクション経由で一覧は読めましたが、新しく作ったセッションを含め、セッションと予約タスクの保存はすべて失敗しました。
 - **ハードリンク**: アプリはリンクが 2 つ以上あるファイルを安全でないものとして扱います。そのようなファイルへの書き込みを拒否し、読み込むときは警告します。さらに、一時ファイルに書いてから名前を変更する方法で保存するため、保存のたびにリンクが切れてしまいます。
 
 これらのチェックは外部から仕込まれたファイルやフォルダーから保護するための仕組みなので、CCDC はそれを回避しません。代わりに、アプリ自身が書くのと同じ通常のファイルをコピーします。
 
-## 必要なもの
-
-- Windows 10/11 と Claude デスクトップアプリ (MSIX 版)
-- [Node.js](https://nodejs.org) 18 以降
-
 ## インストール
 
-[Releases](../../releases) からインストーラーをダウンロードして展開し、`setup.cmd` を実行します。管理者権限は不要です。
+[Releases](../../releases) から、お使いのシステム用のファイルをダウンロードしてください。ファイルにはコード署名がありません ([後述](#セキュリティ警告について)を参照)。
 
-- `%LOCALAPPDATA%\Programs\CCDC` にインストールされます。
-- デスクトップとスタートメニューに `Continuous Claude Desktop Code` のショートカットが作成されます。
-- 設定 > アプリ > インストールされているアプリ に「Continuous Claude Desktop Code (CCDC)」として表示され、そこからアンインストールできます。
-- インストール後すぐにトレイで起動します。
-- Windows へのサインイン時に自動で起動するには `setup.cmd /startup`、自動起動をやめるには `setup.cmd /nostartup` でインストールします。どちらも付けずに再インストールすると、前の設定がそのまま保たれます。
-- 再インストールすると、CCDC が実行中であれば終了してからファイルを置き換えます。設定 (`ccdc.json`) はそのまま残ります。
-- アンインストールしても、Claude のセッションファイルと CCDC のバックアップフォルダーはそのまま残ります。
+**Windows** — `CCDC-<version>-windows-x64.msi` を実行します。管理者権限は不要です。
 
-インストールせずにこのリポジトリから使うには、`ccdc-tray.vbs` を実行するか、下のコマンドラインを使います。
+- `%LOCALAPPDATA%\Programs\CCDC` にインストールされ、デスクトップとスタートメニューに `Continuous Claude Desktop Code` のショートカットが作成されて、CCDC がトレイで起動します。
+- コンピューターの起動時に自動で起動します。止めるには、トレイメニューの「コンピューターの起動時に自動実行」をオフにします。
+- 更新するときは、新しい `.msi` を実行します。CCDC を終了してからファイルを置き換え、もう一度起動します。設定はそのまま残ります。
+- アンインストールは、設定 > アプリ > インストールされているアプリ の「Continuous Claude Desktop Code (CCDC)」から行います。
+- 0.3 のスクリプト版から移行するときは、`.msi` をインストールするだけです。CCDC は初回の起動時に古いバージョンを停止し、その設定とアカウント名を引き継いでから、古いバージョンを削除します。
+
+**macOS** — `CCDC-<version>-macos-universal.dmg` を開いて **CCDC** をアプリケーションフォルダーにドラッグし、起動します。メニューバーに **C** が表示されます。メニューでオフにしない限り、コンピューターの起動時に自動で起動します。Apple シリコンと Intel のどちらでも動作します。
+
+**Linux** (Ubuntu 22.04 以降、Debian 12 以降、Linux Mint 21 以降、x86_64):
+
+```sh
+sudo apt install ./CCDC-<version>-linux-amd64.deb
+```
+
+その後、アプリケーションメニューから **Continuous Claude Desktop Code** を起動します。メニューでオフにしない限り、コンピューターの起動時に自動で起動します。AppIndicator 拡張機能のない GNOME ではトレイアイコンを表示できません (Ubuntu と Linux Mint には含まれています)。
+
+アンインストールしても、Claude のセッションファイル、CCDC の設定、バックアップフォルダーはそのまま残ります。
+
+### セキュリティ警告について
+
+コード署名には個人または企業に結びついた有料の証明書が必要ですが、CCDC は小さな無料のプロジェクトなので、ダウンロードファイルには署名していません。そのため初回はシステムが警告を表示しますが、これは発行元が確認されていないという意味にすぎず、有害なものが見つかったわけではありません。
+
+CCDC に有害なものは含まれていません。インターネットに接続することも、データを収集することもなく、Claude アプリのセッションフォルダーと CCDC 自身のフォルダー以外は何も変更しません。コードはすべてこのリポジトリにあり、リリースファイルはここから GitHub Actions でビルドされ、そのログも公開されています。ダウンロードしたファイルはリリースにある `SHA256SUMS.txt` で照合できます。[自分でビルド](#ビルド)することもできます。
+
+- **Windows**: SmartScreen に「Windows によって PC が保護されました」と表示されたら、**詳細情報** をクリックし、続けて **実行** をクリックします。
+- **macOS**: アプリを検証できないと表示されたら、**システム設定 > プライバシーとセキュリティ** を開いて下にスクロールし、CCDC の横にある **このまま開く** をクリックします。(または、ターミナルで `xattr -dr com.apple.quarantine /Applications/CCDC.app` を実行します。)
+- **Linux**: `.deb` パッケージはこのようなチェックの対象になりません。
 
 ## トレイアプリ
 
-通知領域にオレンジ色の **C** アイコンが表示されます (自動同期がオフのときは灰色)。クリックするとメニューが開きます:
+通知領域またはメニューバーにオレンジ色の **C** が表示されます (自動同期がオフのときは灰色)。クリックするとメニューが開きます:
 
 | メニュー項目 | 動作 |
 | --- | --- |
@@ -87,30 +121,38 @@ CCDC はコピーの前にディスクの空き容量を確認します。コピ
 | サインイン後にコピーを削除 | 既定ではオフです (コピーを残します。上記を参照) |
 | コピー・削除の速度 | 「速い (制限なし)」「標準 (60 MB/s)」「ゆっくり (15 MB/s)」から選びます。削除は「標準」で毎秒 500 ファイル、「ゆっくり」で毎秒 100 ファイルまでに制限されます |
 | 予想時間の行 | 次のサインアウト時のコピーにかかる時間を表示します。コピーを削除する設定の場合は、サインイン後の整理にかかる時間も表示します |
+| コンピューターの起動時に自動実行 | コンピューターにサインインしたときに CCDC を起動します |
 | Language | 表示言語を選びます。この項目は常に英語で表示され、サブメニューの各言語はその言語で書かれています |
-| ログを表示 | `%LOCALAPPDATA%\CCDC\watch.log` を開きます |
+| ログを表示 | CCDC の `watch.log` を開きます |
 | アカウントに名前を付ける (ccdc.json) | 設定ファイルを開き、アカウントにわかりやすい名前を付けます |
 | 終了 | アイコンを消します。コピーの途中なら、終わるまで待ちます |
 
 コピーを始めたとき (予想時間つき)、コピーが終わったとき、サインインを検出したとき、整理が終わったときに、それぞれ通知を表示します。速度を遅くするとコピーに時間がかかるため、次の人は「コピー完了」の通知が出るまで、または予想時間が過ぎるまで待ってからサインインしてください。
 
-予想時間は、現在のフォルダーの状態と、この PC で測ったコピーと削除の速度 (`%LOCALAPPDATA%\CCDC\state.json` に保存) から計算します。
+予想時間は、現在のフォルダーの状態と、このコンピューターで測ったコピーと削除の速度 (CCDC のフォルダーの `state.json` に保存) から計算します。
 
-Windows 11 でアイコンが見えない場合は、タスクバーの `^` (隠れているインジケーター) を確認してください。常に表示するには、設定 > 個人用設定 > タスクバー > その他のシステム トレイ アイコン で Windows PowerShell をオンにします。
+Windows 11 でアイコンが見えない場合は、タスクバーの隠れているインジケーター (`^`) を確認してください。常に表示するには、設定 > 個人用設定 > タスクバー > その他のシステム トレイ アイコン で CCDC をオンにします。
 
-### メモリ使用量
-
-アプリのログはトレイが直接監視し、前回の確認以降に追加された部分だけを読みます。Node.js はコピーや整理の間だけ動き、終われば終了するので、交代と交代の間に動いているのはトレイだけです。トレイは待機中、約 1 分ごとに使っていないメモリを Windows に返します (使用量は約 15 MB)。
+CCDC は約 1 MB の単一のネイティブプログラムです。待機中は 0.5 秒ごとに、前回の確認以降に Claude のログに追加された部分だけを読みます。CCDC 自身のメモリ使用量は約 4 MB です。
 
 ## 設定
 
-設定はプログラムフォルダーの `ccdc.json` に保存されます。トレイメニューで変更するとこのファイルに保存され、再起動しなくても次のコピーや整理から反映されます。
+設定は CCDC のフォルダーの `ccdc.json` に保存されます:
+
+| | CCDC のフォルダー |
+| --- | --- |
+| Windows | `%LOCALAPPDATA%\CCDC` |
+| macOS | `~/Library/Application Support/CCDC` |
+| Linux | `~/.config/ccdc` |
+
+トレイメニューで変更するとこのファイルに保存され、再起動しなくても次のコピーや整理から反映されます。`watch.log` と `state.json` も同じフォルダーにあります。
 
 ```json
 {
   "keepCopies": true,
   "speed": "fast",
   "language": "",
+  "startAtLogin": true,
   "aliases": { "<first 8 characters of an account ID>": "<name>" }
 }
 ```
@@ -119,38 +161,43 @@ Windows 11 でアイコンが見えない場合は、タスクバーの `^` (隠
 | --- | --- |
 | `keepCopies` | `true` (既定): コピーを残します。`false`: サインイン後にコピーを削除します |
 | `speed` | `"fast"` (既定)、`"normal"`、`"gentle"` |
-| `language` | 空欄なら Windows の表示言語に従います。`"ja"` のような言語コードを指定すると、その言語で表示します |
+| `language` | 空欄ならシステムの表示言語に従います。`"ja"` のような言語コードを指定すると、その言語で表示します |
+| `startAtLogin` | トレイメニューの「コンピューターの起動時に自動実行」で設定されます |
 | `aliases` | トレイメニューに表示するアカウント名です |
+| `dataDir`、`appLog` | CCDC が Claude のデータフォルダーやログを自動で見つけられない場合にだけ、それぞれのフルパスを指定します |
 
 ## 言語
 
-トレイメニュー、通知、警告、インストール/アンインストールの画面は、Windows の表示言語に従うか、トレイメニューの **Language** で選んだ言語で表示されます。対応言語: 英語、韓国語、日本語、中国語 (簡体字・繁体字)、スペイン語、フランス語、ドイツ語、イタリア語、ポルトガル語、ロシア語、ウクライナ語、ポーランド語、オランダ語、トルコ語、ベトナム語、インドネシア語、タイ語、アラビア語、ヒンディー語。それ以外の言語は英語で表示されます。
+トレイメニュー、通知、警告は、システムの表示言語か、トレイメニューの **Language** で選んだ言語で表示されます。対応言語: 英語、韓国語、日本語、中国語 (簡体字・繁体字)、スペイン語、フランス語、ドイツ語、イタリア語、ポルトガル語、ロシア語、ウクライナ語、ポーランド語、オランダ語、トルコ語、ベトナム語、インドネシア語、タイ語、アラビア語、ヒンディー語。それ以外の言語は英語で表示されます。
 
-UI の文言はすべて 1 枚のシート [`locales.csv`](locales.csv) にあります。**1 行が 1 言語**、1 列が 1 つの文言です。Excel や Google スプレッドシートで開いて編集できます。言語を追加するには 1 行追加します。
+UI の文言はすべて 1 枚のシート [`locales.csv`](locales.csv) にあり、プログラムに組み込まれています。**1 行が 1 言語**、1 列が 1 つの文言です。Excel や Google スプレッドシートで開けます。言語を追加するには、1 行追加して CCDC を[ビルド](#ビルド)します。
 
-- `lang`: Windows のカルチャ名 (`sv`、`pt-BR`、`zh-Hant` など)。言語と地域が一致する行を優先し、なければ言語が一致する行を使います。
+- `lang`: 言語タグ (`sv`、`pt-BR`、`zh-Hant` など)。言語と地域が一致する行を優先し、なければ言語が一致する行を使います。
 - `name`: その言語で書いた言語名 (`Svenska`)。Language メニューにはこれが表示されます。
 - セル内の改行は `\n` と書きます。`{0}`、`{1}` は数値や名前が入る場所なので、そのまま残してください。
 - 空のセルは英語で表示されます。UTF-8 の CSV で保存してください。
 
-コマンドラインの出力と `watch.log` は、トレイが読み取るため英語のままです。
+コマンドラインの出力と `watch.log` は英語のままです。
 
 ## コマンドライン
 
-```powershell
-node ccdc.mjs status               # app state, settings, sessions per folder, free disk
-node ccdc.mjs estimate             # how long the next sign-out copy / sign-in cleanup would take
-node ccdc.mjs replicate --dry-run  # what a sign-out copy would write right now
-node ccdc.mjs move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)
-node ccdc.mjs watch                # follow the app log in the foreground (the tray does this itself)
+同じプログラムはターミナルからも使えます (Windows では `%LOCALAPPDATA%\Programs\CCDC` にある `ccdc.exe`、macOS では `/Applications/CCDC.app/Contents/MacOS/ccdc`):
+
+```sh
+ccdc status               # app state, settings, sessions per folder, free disk
+ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
+ccdc replicate --dry-run  # what a sign-out copy would write right now
+ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)
+ccdc watch                # follow the Claude log in the foreground, without the tray
+ccdc version
 ```
 
-トレイは次の単発ジョブを実行します: `node ccdc.mjs signout`、`node ccdc.mjs signin --account <id> --org <id>`、`node ccdc.mjs startup` (トレイの起動時や自動同期を再びオンにしたときに、アプリの現在の状態に合わせて同期します)。
+`--data-dir <path>` と `--app-log <path>` を使うと、Claude のデータフォルダーやログを手動で指定できます。
 
 ## 重複のルール
 
 - 同じセッションが複数のフォルダーにある場合は、`lastActivityAt` が最も新しいコピーを採用します。コピーには元の更新時刻が引き継がれるので、同一のコピーはファイルを読まなくてもサイズと時刻で判別できます。
-- 新しいコピーでファイルを置き換えるときは、古いファイルをアプリのデータフォルダーの `ccdc-backups\<時刻>\` に移します。
+- 新しいコピーでファイルを置き換えるときは、古いファイルを Claude のデータフォルダーの `ccdc-backups/<time>/` に移します。
 - `deleted_<id>` マーカーがあるセッションはコピーせず、ほかのフォルダーにあるそのコピーは削除します。
 - 初めてサインインするアカウント・組織にはまだフォルダーがないため、サインアウト時にはそこへコピーできません。この場合、セッションはそのアカウントの次回のサインイン時か、アプリの再起動後に表示されます。
 
@@ -160,6 +207,20 @@ node ccdc.mjs watch                # follow the app log in the foreground (the t
 - セッションファイルにはアカウントごとのコネクター (MCP) 設定が含まれるため、別のアカウントでセッションを開くと一部のコネクターがつながらないことがあります。
 - 予約タスクは共有されず、アカウント・組織フォルダーごとに別々に保持されます。
 - Claude Code CLI のアカウント切り替えは対象外です。CLI は、アカウントに関係なく `~/.claude/projects` のどのセッションも、もともと `--resume` で開けます。
+
+## ビルド
+
+CCDC は Rust で書かれています。[Rust をインストール](https://rustup.rs)してから、次を実行します:
+
+```sh
+cargo build --release                                    # the program (target/release/ccdc)
+powershell -File packaging\windows\build-msi.ps1         # Windows .msi (needs the .NET SDK)
+sh packaging/macos/make-dmg.sh                           # macOS .dmg (on a Mac)
+sh packaging/linux/build-deb.sh                          # Linux .deb (on Ubuntu 22.04, or in Docker:)
+docker run --rm -v "$PWD:/w" -w /w ubuntu:22.04 sh packaging/linux/build-deb.sh
+```
+
+各プラットフォームのバージョンは `Cargo.toml` の `[package.metadata.ccdc]` で設定します。GitHub Actions ([`.github/workflows/build.yml`](.github/workflows/build.yml)) は、プッシュのたびに 3 つすべてをビルドし、`v*` タグの場合は下書きリリースに添付します。
 
 ## ライセンス
 

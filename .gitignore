@@ -1,16 +1,18 @@
-# installer is published separately on GitHub Releases
-installer/
-setup.cmd
+# build output
+target/
+dist/
 
-# account names hold real account IDs
+# settings with real account IDs (now in %LOCALAPPDATA%\CCDC, but never commit one)
 ccdc.json
 claude-alter.json
+
+# the 0.3 script installer, kept out of the repo
+installer/
+setup.cmd
 
 # logs and local test data
 *.log
 ccdc-backups/
 claude-alter-backups/
 node_modules/
-
-# local live-test scripts
 .junction-test/
