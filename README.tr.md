@@ -12,7 +12,7 @@ Resmî değildir; Anthropic ile bağlantılı değildir ve Anthropic tarafından
 
 | Platform | Sürüm | Durum |
 | --- | --- | --- |
-| Windows | 1.0 | Günlük kullanımda (0.3 betiklerinin devamıdır) |
+| Windows | 1.0 | Yeni; Windows'ta gerçek Claude uygulamasıyla denendi ve anlatıldığı gibi çalışıyor (0.3 betiklerinin devamıdır) |
 | macOS | 0.1 | Yeni; henüz bir Mac'te gerçek Claude uygulamasıyla denenmedi |
 | Linux | 0.1 | Yeni; kurulumu Debian 12, Ubuntu 24.04 ve Linux Mint 22'de denendi, gerçek Claude uygulamasıyla henüz denenmedi |
 

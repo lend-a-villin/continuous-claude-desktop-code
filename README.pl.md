@@ -12,7 +12,7 @@ Narzędzie nieoficjalne, niepowiązane z firmą Anthropic ani przez nią niezatw
 
 | Platforma | Wersja | Stan |
 | --- | --- | --- |
-| Windows | 1.0 | Używana na co dzień (kontynuacja skryptów 0.3) |
+| Windows | 1.0 | Nowa; przetestowana z prawdziwą aplikacją Claude w systemie Windows, gdzie działa zgodnie z opisem (kontynuacja skryptów 0.3) |
 | macOS | 0.1 | Nowa; jeszcze nie testowana z prawdziwą aplikacją Claude na Macu |
 | Linux | 0.1 | Nowa; instalacja przetestowana w Debianie 12, Ubuntu 24.04 i Linux Mint 22, ale jeszcze nie z prawdziwą aplikacją Claude |
 

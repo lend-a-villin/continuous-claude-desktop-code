@@ -12,7 +12,7 @@ Claude 桌面版按账户和组织分别保存 Code 会话列表。换一个账�
 
 | 平台 | 版本 | 状态 |
 | --- | --- | --- |
-| Windows | 1.0 | 日常使用中（接续 0.3 版脚本） |
+| Windows | 1.0 | 新版本；已在 Windows 上配合真实的 Claude 应用测试，运行符合说明（接续 0.3 版脚本） |
 | macOS | 0.1 | 新版本；尚未在 Mac 上配合真实的 Claude 应用测试 |
 | Linux | 0.1 | 新版本；已在 Debian 12、Ubuntu 24.04 和 Linux Mint 22 上测试安装，尚未配合真实的 Claude 应用测试 |
 

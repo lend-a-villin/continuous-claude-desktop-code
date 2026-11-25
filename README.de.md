@@ -12,7 +12,7 @@ Inoffiziell; steht in keiner Verbindung zu Anthropic und wird nicht von Anthropi
 
 | Plattform | Version | Status |
 | --- | --- | --- |
-| Windows | 1.0 | Im täglichen Einsatz (Nachfolger der 0.3-Skripte) |
+| Windows | 1.0 | Neu; mit der echten Claude-App unter Windows getestet und funktioniert wie beschrieben (Nachfolger der 0.3-Skripte) |
 | macOS | 0.1 | Neu; noch nicht mit der echten Claude-App auf einem Mac getestet |
 | Linux | 0.1 | Neu; Installation unter Debian 12, Ubuntu 24.04 und Linux Mint 22 getestet, noch nicht mit der echten Claude-App |
 

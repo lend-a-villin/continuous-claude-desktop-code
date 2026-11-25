@@ -12,7 +12,7 @@ Tidak resmi; tidak berafiliasi dengan dan tidak didukung oleh Anthropic.
 
 | Platform | Versi | Status |
 | --- | --- | --- |
-| Windows | 1.0 | Dipakai setiap hari (lanjutan dari skrip 0.3) |
+| Windows | 1.0 | Baru; sudah diuji dengan aplikasi Claude sungguhan di Windows dan berfungsi seperti yang dijelaskan (lanjutan dari skrip 0.3) |
 | macOS | 0.1 | Baru; belum diuji dengan aplikasi Claude sungguhan di Mac |
 | Linux | 0.1 | Baru; instalasinya sudah diuji di Debian 12, Ubuntu 24.04, dan Linux Mint 22, tetapi belum dengan aplikasi Claude sungguhan |
 
