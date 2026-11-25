@@ -1,0 +1,16 @@
+# installer is published separately on GitHub Releases
+installer/
+setup.cmd
+
+# account names hold real account IDs
+ccdc.json
+claude-alter.json
+
+# logs and local test data
+*.log
+ccdc-backups/
+claude-alter-backups/
+node_modules/
+
+# local live-test scripts
+.junction-test/
