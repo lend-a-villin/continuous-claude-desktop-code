@@ -1,0 +1,65 @@
+<!--
+  CCDC Windows installer (WiX 5). Per-user: no admin rights needed.
+    - installs ccdc.exe to %LOCALAPPDATA%\Programs\CCDC
+    - desktop and Start menu shortcuts (the Start menu one carries the
+      AppUserModelID that Windows needs to show CCDC's notifications)
+    - starts CCDC when you sign in to Windows (can be turned off in the tray menu)
+    - closes a running CCDC before replacing or removing it, and starts it after install
+  Build: wix build packaging\windows\ccdc.wxs -ext WixToolset.Util.wixext -arch x64 -d Version=0.4.0 -o CCDC.msi
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+  <Package Name="Continuous Claude Desktop Code (CCDC)" Manufacturer="CCDC" Version="$(Version)"
+           UpgradeCode="9A2A1EE9-E271-4DBB-8722-7EBFB772C42C" Scope="perUser" Language="1033" Compressed="yes">
+    <!-- AllowSameVersionUpgrades: a rebuilt package of the same version replaces the installed one instead of installing beside it -->
+    <MajorUpgrade AllowSameVersionUpgrades="yes" DowngradeErrorMessage="A newer version of CCDC is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="ccdc.ico" SourceFile="target\icons\ccdc.ico" />
+    <Property Id="ARPPRODUCTICON" Value="ccdc.ico" />
+    <Property Id="ARPNOMODIFY" Value="1" />
+    <Property Id="ARPNOREPAIR" Value="1" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/lend-a-villin/continuous-claude-desktop-code" />
+
+    <StandardDirectory Id="LocalAppDataFolder">
+      <Directory Id="ProgramsDir" Name="Programs">
+        <Directory Id="INSTALLFOLDER" Name="CCDC" />
+      </Directory>
+    </StandardDirectory>
+
+    <!-- per-user components use a registry value as their key path -->
+    <Component Id="Main" Directory="INSTALLFOLDER" Guid="EECC9593-27B0-4052-A325-A73281D49000">
+      <File Id="CcdcExe" Source="target\release\ccdc.exe" KeyPath="no" />
+      <RegistryValue Root="HKCU" Key="Software\CCDC" Name="Installed" Type="integer" Value="1" KeyPath="yes" />
+      <RemoveFolder Id="RemoveInstallFolder" Directory="INSTALLFOLDER" On="uninstall" />
+      <RemoveFolder Id="RemoveProgramsDir" Directory="ProgramsDir" On="uninstall" />
+    </Component>
+
+    <Component Id="StartMenuShortcut" Directory="ProgramMenuFolder" Guid="*">
+      <Shortcut Id="StartMenuLnk" Name="Continuous Claude Desktop Code" Target="[INSTALLFOLDER]ccdc.exe"
+                WorkingDirectory="INSTALLFOLDER" Icon="ccdc.ico"
+                Description="Keeps Claude desktop Code sessions available across accounts on a shared computer.">
+        <ShortcutProperty Key="System.AppUserModel.ID" Value="CCDC.ContinuousClaudeDesktopCode" />
+      </Shortcut>
+      <RegistryValue Root="HKCU" Key="Software\CCDC" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="*">
+      <Shortcut Id="DesktopLnk" Name="Continuous Claude Desktop Code" Target="[INSTALLFOLDER]ccdc.exe"
+                WorkingDirectory="INSTALLFOLDER" Icon="ccdc.ico"
+                Description="Keeps Claude desktop Code sessions available across accounts on a shared computer." />
+      <RegistryValue Root="HKCU" Key="Software\CCDC" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <Component Id="StartAtSignIn" Directory="INSTALLFOLDER" Guid="*">
+      <RegistryValue Root="HKCU" Key="Software\Microsoft\Windows\CurrentVersion\Run" Name="CCDC" Type="string"
+                     Value="&quot;[INSTALLFOLDER]ccdc.exe&quot;" KeyPath="yes" />
+    </Component>
+
+    <util:CloseApplication Id="CloseCcdc" Target="ccdc.exe" CloseMessage="no" TerminateProcess="1" RebootPrompt="no" />
+
+    <CustomAction Id="LaunchCcdc" FileRef="CcdcExe" ExeCommand="" Return="asyncNoWait" Impersonate="yes" />
+    <InstallExecuteSequence>
+      <Custom Action="LaunchCcdc" After="InstallFinalize" Condition="NOT REMOVE" />
+    </InstallExecuteSequence>
+  </Package>
+</Wix>

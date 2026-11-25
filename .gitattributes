@@ -1,0 +1,2 @@
+# shell scripts run in Linux containers and on macOS: keep LF line endings
+*.sh text eol=lf

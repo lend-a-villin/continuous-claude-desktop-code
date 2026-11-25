@@ -2,15 +2,20 @@
 
 **English** | [한국어](README.ko.md) | [日本語](README.ja.md) | [简体中文](README.zh-Hans.md) | [繁體中文](README.zh-Hant.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Українська](README.uk.md) | [Polski](README.pl.md) | [Nederlands](README.nl.md) | [Türkçe](README.tr.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [ไทย](README.th.md) | [العربية](README.ar.md) | [हिन्दी](README.hi.md)
 
-A Windows tray app that keeps the local **Code** sessions of the Claude desktop app available to whichever Claude account signs in on the PC.
+A Windows tray app that keeps your Claude desktop **Code** sessions when you switch Claude accounts.
+
+The Claude desktop app keeps a separate Code session list for each account and organization. Sign in with another account and the list looks empty, even though the conversations are still on the PC. CCDC copies the sessions across, so whichever account signs in next sees all of them.
 
 Unofficial; not affiliated with or endorsed by Anthropic.
 
+**[Download the latest release](../../releases/latest)** · Windows 10/11 · Node.js 18+ · no admin rights needed
+
 ## Who it is for
 
-CCDC is made for **workplaces that run 24 hours in three shifts**. On each shift a different person sits at the same desk (one PC, one Windows user) and signs in to the Claude desktop app with their own Claude account. With CCDC, the next shift signs in and picks up the Code work the previous shift left off.
+- **Shared PCs and shift work.** In a workplace that runs 24 hours in three shifts, a different person sits at the same desk (one PC, one Windows user) on each shift and signs in with their own Claude account. With CCDC, the next shift picks up the Code work the previous shift left off.
+- **One person, several accounts.** If you switch between a personal and a work account, or between organizations, on the same PC, your Code sessions are there whichever account you sign in with.
 
-This means every Code session on the PC is visible to everyone who signs in on it. Don't use CCDC where people must not see each other's sessions. With a company (organization) account, check your company's policy as well.
+Every Code session on the PC becomes visible to every account that signs in on it. Don't use CCDC where people must not see each other's sessions. If you use a company (organization) account, check your company's policy first: CCDC copies a work account's sessions into a personal account's folder too, and the other way round.
 
 ## The problem it solves
 

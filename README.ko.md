@@ -2,15 +2,20 @@
 
 [English](README.md) | **한국어** | [日本語](README.ja.md) | [简体中文](README.zh-Hans.md) | [繁體中文](README.zh-Hant.md) | [Español](README.es.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Italiano](README.it.md) | [Português](README.pt.md) | [Русский](README.ru.md) | [Українська](README.uk.md) | [Polski](README.pl.md) | [Nederlands](README.nl.md) | [Türkçe](README.tr.md) | [Tiếng Việt](README.vi.md) | [Bahasa Indonesia](README.id.md) | [ไทย](README.th.md) | [العربية](README.ar.md) | [हिन्दी](README.hi.md)
 
-이 PC에서 어떤 Claude 계정으로 로그인하든 Claude 데스크톱 앱의 로컬 **Code** 세션을 이어서 사용할 수 있게 해 주는 Windows 트레이 앱입니다.
+Claude 계정을 바꿔도 Claude 데스크톱 앱의 **Code** 세션이 사라지지 않게 해 주는 Windows 트레이 앱입니다.
+
+Claude 데스크톱 앱은 계정·조직마다 Code 세션 목록을 따로 관리합니다. 그래서 다른 계정으로 로그인하면, 대화 기록은 PC에 그대로 남아 있는데도 세션 목록이 비어 보입니다. CCDC가 세션을 모든 계정으로 복사해 두므로, 다음에 어떤 계정으로 로그인하든 모든 세션이 보입니다.
 
 비공식 프로그램으로, Anthropic과 관련이 없으며 Anthropic의 승인을 받지 않았습니다.
 
+**[최신 버전 다운로드](../../releases/latest)** · Windows 10/11 · Node.js 18 이상 · 관리자 권한 불필요
+
 ## 사용 대상
 
-CCDC는 **24시간 3교대로 운영되는 직장**을 위해 만들어졌습니다. 교대 조마다 다른 사람이 같은 자리(한 PC, 한 Windows 사용자)에 앉아 각자 자기 Claude 계정으로 Claude 데스크톱 앱에 로그인하는 환경에서 유용합니다. CCDC를 사용하면 다음 근무조가 로그인해서 앞 근무조가 하던 Code 작업을 그대로 이어받을 수 있습니다.
+- **공용 PC와 교대 근무.** 24시간 3교대로 운영되는 직장에서는 교대 조마다 다른 사람이 같은 자리(한 PC, 한 Windows 사용자)에 앉아 각자 자기 Claude 계정으로 로그인합니다. CCDC를 사용하면 다음 근무조가 앞 근무조가 하던 Code 작업을 그대로 이어받을 수 있습니다.
+- **한 사람이 여러 계정을 쓰는 경우.** 같은 PC에서 개인 계정과 회사 계정을, 또는 여러 조직을 오가며 쓴다면 어느 계정으로 로그인하든 같은 Code 세션을 이어서 사용할 수 있습니다.
 
-그러므로 이 PC에 로그인하는 사람은 누구나 이 PC의 모든 Code 세션을 볼 수 있습니다. 서로의 세션을 보면 안 되는 환경에서는 CCDC를 사용하지 마세요. 회사(조직) 계정이라면 사내 정책도 확인하세요.
+CCDC를 사용하면 이 PC에 로그인하는 모든 계정에서 이 PC의 모든 Code 세션이 보입니다. 서로의 세션을 보면 안 되는 환경에서는 CCDC를 사용하지 마세요. 회사(조직) 계정을 사용한다면 먼저 사내 정책을 확인하세요. CCDC는 회사 계정의 세션을 개인 계정 폴더로도 복사하며, 그 반대도 마찬가지입니다.
 
 ## 해결하는 문제
 
