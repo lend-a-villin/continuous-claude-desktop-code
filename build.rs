@@ -18,9 +18,28 @@ fn main() {
     let ico_path = dir.join("ccdc.ico");
     std::fs::write(&ico_path, icon::ico(&[16, 24, 32, 48, 64, 256], icon::ORANGE)).unwrap();
 
-    if std::env::var("CARGO_CFG_TARGET_OS").as_deref() == Ok("windows") {
+    // this platform's version, from [package.metadata.ccdc] in Cargo.toml
+    println!("cargo:rerun-if-changed=Cargo.toml");
+    let os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+    let key = match os.as_str() {
+        "windows" => "windows",
+        "macos" => "macos",
+        _ => "linux",
+    };
+    let manifest = std::fs::read_to_string(root.join("Cargo.toml")).unwrap();
+    let version = manifest
+        .split("[package.metadata.ccdc]")
+        .nth(1)
+        .and_then(|sec| sec.lines().find_map(|l| l.trim().strip_prefix(key)?.trim().strip_prefix('=')?.trim().strip_prefix('"')?.split('"').next()))
+        .unwrap_or_else(|| panic!("no {key} version in [package.metadata.ccdc]"))
+        .to_string();
+    println!("cargo:rustc-env=CCDC_VERSION={version}");
+
+    if os == "windows" {
         let mut res = winresource::WindowsResource::new();
         res.set_icon(ico_path.to_str().unwrap());
+        res.set("ProductVersion", &version);
+        res.set("FileVersion", &version);
         res.set("ProductName", "Continuous Claude Desktop Code");
         res.set("FileDescription", "CCDC (Continuous Claude Desktop Code)");
         res.set("CompanyName", "CCDC");

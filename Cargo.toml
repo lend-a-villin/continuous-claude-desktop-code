@@ -1,6 +1,6 @@
 [package]
 name = "ccdc"
-version = "0.4.0"
+version = "1.0.0"
 edition = "2021"
 description = "Keeps Claude desktop Code sessions available to every account that signs in on a shared computer"
 license = "MIT"
@@ -13,6 +13,14 @@ build = "build.rs"
 [[bin]]
 name = "ccdc"
 path = "src/main.rs"
+
+# Each platform has its own version: Windows continues from the 0.3.0 scripts,
+# macOS and Linux are new. build.rs puts the right one into the program
+# (`ccdc version`), and the packaging scripts name the files with it.
+[package.metadata.ccdc]
+windows = "1.0.0"
+macos = "0.1.0"
+linux = "0.1.0"
 
 [dependencies]
 serde_json = { version = "1", features = ["preserve_order"] }

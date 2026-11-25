@@ -4,7 +4,7 @@
 $ErrorActionPreference = 'Stop'
 $root = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 Set-Location $root
-$version = (Select-String -Path Cargo.toml -Pattern '^version = "(.*)"' | Select-Object -First 1).Matches[0].Groups[1].Value
+$version = (Select-String -Path Cargo.toml -Pattern '^windows = "(.*)"' | Select-Object -First 1).Matches[0].Groups[1].Value
 
 cargo build --release
 if ($LASTEXITCODE) { exit $LASTEXITCODE }

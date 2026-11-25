@@ -4,7 +4,7 @@
 # the user to allow it once (see the README).
 set -eu
 cd "$(dirname "$0")/../.."
-VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+VERSION=$(sed -n 's/^macos = "\(.*\)"/\1/p' Cargo.toml | head -1)  # [package.metadata.ccdc]
 
 rustup target add aarch64-apple-darwin x86_64-apple-darwin
 cargo build --release --target aarch64-apple-darwin

@@ -266,6 +266,8 @@ fn main() -> ExitCode {
         }
     };
     if args.cmd.is_none() && !args.help {
+        // don't hold the program folder open (an uninstall could not remove it)
+        let _ = std::env::set_current_dir(platform::state_dir());
         tray::run();
         return ExitCode::SUCCESS;
     }
@@ -281,7 +283,7 @@ fn main() -> ExitCode {
         Some("move") => cmd_move(&args).map(|_| ExitCode::SUCCESS),
         Some("watch") => cmd_watch(&args).map(|_| ExitCode::SUCCESS),
         Some("version") => {
-            println!("ccdc {}", env!("CARGO_PKG_VERSION"));
+            println!("ccdc {}", env!("CCDC_VERSION"));
             Ok(ExitCode::SUCCESS)
         }
         Some(other) => Err(format!("unknown command: {other}\n\n{HELP}")),

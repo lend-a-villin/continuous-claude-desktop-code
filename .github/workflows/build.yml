@@ -49,14 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
-      - run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libayatana-appindicator3-dev libxdo-dev
-      - run: cargo test --release
-      - run: cargo install cargo-deb --locked
-      - run: |
-          cargo deb
-          mkdir -p dist
-          v=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
-          cp target/debian/*.deb "dist/CCDC-$v-linux-amd64.deb"
+      - run: sh packaging/linux/build-deb.sh
       - uses: actions/upload-artifact@v4
         with:
           name: linux

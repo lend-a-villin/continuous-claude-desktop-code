@@ -57,8 +57,14 @@
 
     <util:CloseApplication Id="CloseCcdc" Target="ccdc.exe" CloseMessage="no" TerminateProcess="1" RebootPrompt="no" />
 
+    <!-- Close a running CCDC first, before Windows checks for files in use; otherwise
+         it would ask the user to close it (the CloseApplication above runs too late for that). -->
+    <SetProperty Id="WixQuietExecCmdLine" Value="&quot;[System64Folder]taskkill.exe&quot; /F /IM ccdc.exe" Before="StopCcdc" Sequence="execute" />
+    <CustomAction Id="StopCcdc" BinaryRef="Wix4UtilCA_X64" DllEntry="WixQuietExec" Execute="immediate" Return="ignore" />
+
     <CustomAction Id="LaunchCcdc" FileRef="CcdcExe" ExeCommand="" Return="asyncNoWait" Impersonate="yes" />
     <InstallExecuteSequence>
+      <Custom Action="StopCcdc" Before="InstallValidate" />
       <Custom Action="LaunchCcdc" After="InstallFinalize" Condition="NOT REMOVE" />
     </InstallExecuteSequence>
   </Package>

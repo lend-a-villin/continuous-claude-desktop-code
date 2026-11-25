@@ -40,16 +40,21 @@ pub fn data_dir_candidates() -> Vec<PathBuf> {
         }
         if let Some(roaming) = env_path("APPDATA") {
             v.push(roaming.join("Claude"));
+            v.push(roaming.join("Claude-3p"));
         }
     }
+    // macOS / Linux: Electron's default <app data>/Claude. Organizations that run Claude
+    // through their own cloud provider ("3p" mode) get a "-3p" suffix (seen in the macOS app).
     #[cfg(target_os = "macos")]
-    v.push(home().join("Library/Application Support/Claude"));
+    for name in ["Claude", "Claude-3p"] {
+        v.push(home().join("Library/Application Support").join(name));
+    }
     #[cfg(all(unix, not(target_os = "macos")))]
     {
-        // official beta (apt package claude-desktop): Electron's default ~/.config/<app name>
         let config = env_path("XDG_CONFIG_HOME").unwrap_or_else(|| home().join(".config"));
-        v.push(config.join("Claude"));
-        v.push(config.join("claude-desktop"));
+        for name in ["Claude", "Claude-3p", "claude-desktop"] {
+            v.push(config.join(name));
+        }
     }
     v
 }
@@ -62,7 +67,12 @@ pub fn app_log_candidates(data_dir: &Path) -> Vec<PathBuf> {
         v.push(local.join("Claude").join("Logs").join("main.log"));
     }
     #[cfg(target_os = "macos")]
-    v.push(home().join("Library/Logs/Claude/main.log"));
+    {
+        // ~/Library/Logs/<data folder name>, e.g. Logs/Claude or Logs/Claude-3p
+        let name = data_dir.file_name().map(|n| n.to_os_string()).unwrap_or_else(|| "Claude".into());
+        v.push(home().join("Library/Logs").join(name).join("main.log"));
+    }
+    // Linux (and older builds): <data folder>/logs
     v.push(data_dir.join("logs").join("main.log"));
     v.push(data_dir.join("Logs").join("main.log"));
     v
