@@ -12,7 +12,7 @@ Não oficial; não é afiliado nem endossado pela Anthropic.
 
 | Plataforma | Versão | Situação |
 | --- | --- | --- |
-| Windows | 1.0 | Em uso diário (sucessora dos scripts da 0.3) |
+| Windows | 1.0 | Nova; testada com o aplicativo Claude real no Windows, onde funciona como descrito (sucessora dos scripts da 0.3) |
 | macOS | 0.1 | Nova; ainda não testada com o aplicativo Claude real em um Mac |
 | Linux | 0.1 | Nova; instalação testada no Debian 12, Ubuntu 24.04 e Linux Mint 22, ainda não com o aplicativo Claude real |
 

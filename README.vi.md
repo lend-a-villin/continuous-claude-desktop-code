@@ -12,7 +12,7 @@ Công cụ không chính thức; không liên kết với Anthropic và không �
 
 | Nền tảng | Phiên bản | Trạng thái |
 | --- | --- | --- |
-| Windows | 1.0 | Đang được dùng hằng ngày (kế tục các script 0.3) |
+| Windows | 1.0 | Mới; đã thử với ứng dụng Claude thật trên Windows và hoạt động như mô tả (kế tục các script 0.3) |
 | macOS | 0.1 | Mới; chưa thử với ứng dụng Claude thật trên máy Mac |
 | Linux | 0.1 | Mới; đã thử cài đặt trên Debian 12, Ubuntu 24.04 và Linux Mint 22, nhưng chưa thử với ứng dụng Claude thật |
 
