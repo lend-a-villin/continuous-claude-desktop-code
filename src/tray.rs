@@ -1,7 +1,7 @@
 // The tray (menu bar) app.
 //   - a worker thread follows the Claude app log and does the copying and cleanup;
 //   - the main thread owns the icon, the menu and dialogs (macOS and Linux need that).
-// Menu: auto sync on/off; for when a sign-out was missed, move sessions now (shown
+// Menu: how long ago each signed-out account signed in; auto sync on/off; for when a sign-out was missed, move sessions now (shown
 // while copies are deleted after sign-in) or sync all accounts now (shown while copies
 // are kept); delete copies after sign-in,
 // copy/delete speed with a time estimate, start with the computer, Language,
@@ -23,7 +23,6 @@ use crate::core::{self, Account, Estimate, LogEvent, Report};
 use crate::i18n::Strings;
 use crate::{icon, platform};
 
-const MOVE_POS: usize = 3; // header, separator, auto sync, then move now / sync all
 const SETTLE: Duration = Duration::from_secs(6); // the app reads its session folder twice within ~2 s of sign-in
 
 enum Cmd {
@@ -85,6 +84,7 @@ struct Worker {
     data_dir: Option<PathBuf>,
     app_log: Option<PathBuf>,
     follower: Option<core::LogFollower>,
+    sign_ins: Option<core::SignIns>,
     auto_sync: bool,
     signed_in: Option<(String, String)>,
     signin_due: Option<(Instant, String, String)>,
@@ -120,6 +120,7 @@ impl Worker {
                     None => core::log("Claude app log (main.log) not found; set \"appLog\" in ccdc.json"),
                 }
                 self.follower = self.app_log.clone().map(core::LogFollower::new);
+                self.sign_ins = self.app_log.as_deref().map(core::SignIns::new);
                 if let Some(LogEvent::SignedIn { account, org }) = core::read_app_state(self.app_log.as_deref()) {
                     self.signed_in = Some((account, org));
                 }
@@ -179,12 +180,18 @@ impl Worker {
         }
     }
 
-    fn refresh(&self) {
+    fn refresh(&mut self) {
         let settings = core::load_settings();
-        let (accounts, estimate) = match &self.data_dir {
+        let (mut accounts, estimate) = match &self.data_dir {
             Some(d) => (core::accounts(d, self.app_log.as_deref(), &settings), core::estimate(d, &settings).ok()),
             None => (Err(self.last_error.clone()), None),
         };
+        if let (Ok(list), Some(s)) = (&mut accounts, &mut self.sign_ins) {
+            let ago = s.ago();
+            for a in list {
+                a.signed_in_ago = ago.get(&a.account).copied();
+            }
+        }
         self.send(UiEvent::Info { accounts, estimate });
     }
 
@@ -301,6 +308,8 @@ struct Ui {
     auto_sync: bool,
     menu: Menu,
     header: MenuItem,
+    /// one line per signed-out account: how long ago it signed in (for the usage limits)
+    sign_in_lines: Vec<MenuItem>,
     watch: CheckMenuItem,
     move_to: Submenu,
     move_items: Vec<(CheckMenuItem, Account)>,
@@ -365,6 +374,7 @@ impl Ui {
             auto_sync: true,
             menu,
             header,
+            sign_in_lines: Vec::new(),
             watch,
             move_to,
             move_items: Vec::new(),
@@ -472,6 +482,24 @@ impl Ui {
             }
             None => self.estimate.set_text("—"),
         }
+        for item in self.sign_in_lines.drain(..) {
+            let _ = self.menu.remove(&item);
+        }
+        if let Ok(list) = &accounts {
+            let mut out: Vec<&Account> = list.iter().filter(|a| !a.signed_in && a.signed_in_ago.is_some()).collect();
+            out.sort_by_key(|a| a.signed_in_ago);
+            for (i, a) in out.into_iter().enumerate() {
+                let secs = a.signed_in_ago.unwrap_or(0);
+                let text = if secs >= 86400 {
+                    self.t("last_signin_days", &[&account_name(a), &(secs / 86400)])
+                } else {
+                    self.t("last_signin", &[&account_name(a), &(secs / 3600), &(secs % 3600 / 60)])
+                };
+                let item = MenuItem::new(text, false, None);
+                let _ = self.menu.insert(&item, 1 + i); // right below the status line
+                self.sign_in_lines.push(item);
+            }
+        }
         for (item, _) in self.move_items.drain(..) {
             let _ = self.move_to.remove(&item);
         }
@@ -503,8 +531,13 @@ impl Ui {
         let (old, new): (&dyn IsMenuItem, &dyn IsMenuItem) =
             if show { (&self.sync_all, &self.move_to) } else { (&self.move_to, &self.sync_all) };
         let _ = self.menu.remove(old);
-        let _ = self.menu.insert(new, MOVE_POS);
+        let _ = self.menu.insert(new, self.move_pos());
         self.move_shown = show;
+    }
+
+    /// Right below auto sync (the sign-in lines above it come and go).
+    fn move_pos(&self) -> usize {
+        self.menu.items().iter().position(|i| i.id() == self.watch.id()).map_or(3, |p| p + 1)
     }
 
     fn save(&self, key: &str, value: Value) -> bool {
@@ -575,6 +608,7 @@ pub fn run() {
         data_dir: None,
         app_log: None,
         follower: None,
+        sign_ins: None,
         auto_sync: true,
         signed_in: None,
         signin_due: None,
@@ -701,7 +735,8 @@ mod tests {
             ui.show_move(show);
             let ids = ids(&ui);
             let (shown, hidden) = if show { (ui.move_to.id(), ui.sync_all.id()) } else { (ui.sync_all.id(), ui.move_to.id()) };
-            assert_eq!(&ids[MOVE_POS], shown);
+            assert_eq!(&ids[ui.move_pos()], shown);
+            assert_eq!(ids[ui.move_pos() - 1], *ui.watch.id());
             assert!(!ids.contains(hidden));
             assert_eq!(ids.len(), 16);
         }

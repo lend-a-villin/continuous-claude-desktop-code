@@ -283,6 +283,83 @@ pub fn read_app_state(app_log: Option<&Path>) -> Option<LogEvent> {
     None
 }
 
+/// The local time at the start of an app log line ("2026-11-28 16:36:17 [info] ..."),
+/// on the `platform::civil_secs` scale.
+fn line_time(line: &str) -> Option<i64> {
+    let b = line.as_bytes();
+    if b.len() < 19 || b[4] != b'-' || b[7] != b'-' || b[10] != b' ' || b[13] != b':' || b[16] != b':' {
+        return None;
+    }
+    let n = |from: usize, to: usize| line.get(from..to)?.parse::<i64>().ok();
+    Some(platform::civil_secs(n(0, 4)?, n(5, 7)?, n(8, 10)?, n(11, 13)?, n(14, 16)?, n(17, 19)?))
+}
+
+/// When each account last signed in, read from the app log as it grows. A sign-in is the
+/// start of a signed-in stretch: the app reopening on the same account does not count.
+pub struct SignIns {
+    path: PathBuf,
+    offset: u64,
+    partial: Vec<u8>,
+    current: Option<String>,
+    started: HashMap<String, i64>,
+}
+
+impl SignIns {
+    pub fn new(app_log: &Path) -> SignIns {
+        let mut s = SignIns { path: app_log.to_path_buf(), offset: 0, partial: Vec::new(), current: None, started: HashMap::new() };
+        // the app starts a new main.log at about 10 MB; the previous one is main1.log
+        if let Some(text) = app_log.parent().and_then(|d| fs::read(d.join("main1.log")).ok()) {
+            s.feed(&text);
+        }
+        s
+    }
+
+    fn feed(&mut self, bytes: &[u8]) {
+        for line in String::from_utf8_lossy(bytes).lines() {
+            match parse_log_line(line) {
+                Some(LogEvent::SignedOut) => self.current = None,
+                Some(LogEvent::SignedIn { account, .. }) if self.current.as_ref() != Some(&account) => {
+                    if let Some(t) = line_time(line) {
+                        self.started.insert(account.clone(), t);
+                    }
+                    self.current = Some(account);
+                }
+                _ => {}
+            }
+        }
+    }
+
+    /// Reads what the app added to its log since last time.
+    fn update(&mut self) {
+        let Ok(mut f) = File::open(&self.path) else { return };
+        let len = f.metadata().map(|m| m.len()).unwrap_or(0);
+        if len < self.offset {
+            // a new log file
+            self.offset = 0;
+            self.partial.clear();
+        }
+        if len == self.offset || f.seek(SeekFrom::Start(self.offset)).is_err() {
+            return;
+        }
+        let mut data = std::mem::take(&mut self.partial);
+        if f.take(len - self.offset).read_to_end(&mut data).is_err() {
+            return;
+        }
+        self.offset = len;
+        // keep an unfinished last line for next time
+        let cut = data.iter().rposition(|&b| b == b'\n').map_or(0, |i| i + 1);
+        self.partial = data.split_off(cut);
+        self.feed(&data);
+    }
+
+    /// Seconds since each account last signed in.
+    pub fn ago(&mut self) -> HashMap<String, i64> {
+        self.update();
+        let now = platform::local_now_secs();
+        self.started.iter().map(|(a, t)| (a.clone(), (now - t).max(0))).collect()
+    }
+}
+
 pub fn signed_in_account(data_dir: &Path, app_log: Option<&Path>) -> Option<String> {
     match read_app_state(app_log) {
         Some(LogEvent::SignedIn { account, .. }) => Some(account),
@@ -775,6 +852,8 @@ pub struct Account {
     pub alias: String,
     pub signed_in: bool,
     pub sessions: usize,
+    /// seconds since this account last signed in, when the app log tells (filled by the tray)
+    pub signed_in_ago: Option<i64>,
 }
 
 pub fn accounts(data_dir: &Path, app_log: Option<&Path>, settings: &Settings) -> Result<Vec<Account>, String> {
@@ -790,6 +869,7 @@ pub fn accounts(data_dir: &Path, app_log: Option<&Path>, settings: &Settings) ->
                 alias: alias_for(&settings.aliases, &l.account),
                 signed_in: active.as_deref() == Some(l.account.as_str()),
                 sessions: l.sessions.len(),
+                signed_in_ago: None,
             });
         }
     }
@@ -971,6 +1051,37 @@ mod tests {
         let line = format!("[info] [LocalSessionManager] Initialization succeeded — accountId={a}, orgId={o}");
         assert_eq!(parse_log_line(&line), Some(LogEvent::SignedIn { account: a.into(), org: o.into() }));
         assert_eq!(parse_log_line("[LocalSessionManager] Initialization succeeded — accountId=bad, orgId=bad"), None);
+    }
+
+    #[test]
+    fn sign_in_times() {
+        let dir = std::env::temp_dir().join(format!("ccdc-signins-{}", std::process::id()));
+        fs::create_dir_all(&dir).unwrap();
+        let log = dir.join("main.log");
+        let a = "11111111-1111-4111-8111-111111111111";
+        let b = "22222222-2222-4222-8222-222222222222";
+        let o = "33333333-3333-4333-8333-333333333333";
+        let init = |t: &str, acc: &str| format!("{t} [info] [LocalSessionManager] Initialization succeeded — accountId={acc}, orgId={o}, existingSessions=1\n");
+        let out = |t: &str| format!("{t} [info] Login-state transition (loggedOut: false → true)\n");
+        let mut text = init("2026-11-28 10:00:00", a);
+        text += &init("2026-11-28 11:00:00", a); // the app reopened: still the 10:00 sign-in
+        text += &out("2026-11-28 12:00:00");
+        text += &init("2026-11-28 12:01:00", b);
+        fs::write(&log, &text).unwrap();
+        let mut s = SignIns::new(&log);
+        s.update();
+        assert_eq!(s.started[a], platform::civil_secs(2026, 11, 28, 10, 0, 0));
+        assert_eq!(s.started[b], platform::civil_secs(2026, 11, 28, 12, 1, 0));
+        // more lines, the last one not finished yet
+        let more = out("2026-11-28 13:00:00") + &init("2026-11-28 13:05:00", a);
+        let (head, tail) = more.split_at(more.len() - 10);
+        fs::OpenOptions::new().append(true).open(&log).unwrap().write_all(head.as_bytes()).unwrap();
+        s.update();
+        assert_eq!(s.started[a], platform::civil_secs(2026, 11, 28, 10, 0, 0));
+        fs::OpenOptions::new().append(true).open(&log).unwrap().write_all(tail.as_bytes()).unwrap();
+        s.update();
+        assert_eq!(s.started[a], platform::civil_secs(2026, 11, 28, 13, 5, 0));
+        let _ = fs::remove_dir_all(&dir);
     }
 
     #[test]
