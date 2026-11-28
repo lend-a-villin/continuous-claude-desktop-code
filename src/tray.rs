@@ -1,7 +1,9 @@
 // The tray (menu bar) app.
 //   - a worker thread follows the Claude app log and does the copying and cleanup;
 //   - the main thread owns the icon, the menu and dialogs (macOS and Linux need that).
-// Menu: auto sync on/off, move sessions now, delete copies after sign-in,
+// Menu: auto sync on/off; for when a sign-out was missed, move sessions now (shown
+// while copies are deleted after sign-in) or sync all accounts now (shown while copies
+// are kept); delete copies after sign-in,
 // copy/delete speed with a time estimate, start with the computer, Language,
 // log, account names, quit. UI text comes from locales.csv.
 
@@ -21,11 +23,13 @@ use crate::core::{self, Account, Estimate, LogEvent, Report};
 use crate::i18n::Strings;
 use crate::{icon, platform};
 
+const MOVE_POS: usize = 3; // header, separator, auto sync, then move now / sync all
 const SETTLE: Duration = Duration::from_secs(6); // the app reads its session folder twice within ~2 s of sign-in
 
 enum Cmd {
     AutoSync(bool),
     Move(Account),
+    SyncAll,
     Refresh,
     Quit,
 }
@@ -211,6 +215,30 @@ impl Worker {
         self.send(UiEvent::WorkerDone);
     }
 
+    /// Copies every session into every account folder now: the sign-out copy, run by
+    /// hand when the app's sign-out was not detected.
+    fn manual_sync(&mut self) {
+        if self.data_dir.is_none() {
+            self.send(UiEvent::Notify(Strings::load(&core::load_settings().language).t("ev_failed", &[&self.last_error])));
+            return;
+        }
+        self.run_job(|w, d| {
+            let s = Strings::load(&core::load_settings().language);
+            core::on_sign_out(d, "Manual sync", &mut |r| match r {
+                Report::CopyStarted { files, bytes, seconds } => w.send(UiEvent::Notify(format!(
+                    "{} {}",
+                    s.t("sync_start", &[&files, &core::mb(bytes)]),
+                    s.t("eta_seconds", &[&seconds])
+                ))),
+                Report::CopyDone { files, seconds } => {
+                    w.send(UiEvent::Notify(s.t("sync_done", &[&files, &format!("{seconds:.1}")])))
+                }
+                Report::NothingToCopy => w.send(UiEvent::Notify(s.t("sync_nothing", &[]))),
+                r => w.report(r),
+            });
+        });
+    }
+
     fn run(mut self, rx: Receiver<Cmd>) {
         if self.locate() {
             self.startup();
@@ -231,6 +259,7 @@ impl Worker {
                     }
                 }
                 Ok(Cmd::Move(acc)) => self.manual_move(acc),
+                Ok(Cmd::SyncAll) => self.manual_sync(),
                 Ok(Cmd::Refresh) => self.refresh(),
                 Err(RecvTimeoutError::Timeout) => {}
             }
@@ -275,6 +304,9 @@ struct Ui {
     watch: CheckMenuItem,
     move_to: Submenu,
     move_items: Vec<(CheckMenuItem, Account)>,
+    sync_all: MenuItem,
+    /// true: "move now" is in the menu (copies are deleted); false: "sync all accounts"
+    move_shown: bool,
     delete: CheckMenuItem,
     speed: Submenu,
     speeds: Vec<(CheckMenuItem, core::Speed)>,
@@ -300,6 +332,9 @@ impl Ui {
         let header = MenuItem::new("", false, None);
         let watch = CheckMenuItem::new("", true, true, None);
         let move_to = Submenu::new("", true);
+        let sync_all = MenuItem::new("", true, None);
+        let move_shown = !settings.keep_copies;
+        let move_or_sync: &dyn IsMenuItem = if move_shown { &move_to } else { &sync_all };
         let delete = CheckMenuItem::new("", true, !settings.keep_copies, None);
         let speed = Submenu::new("", true);
         let speeds: Vec<(CheckMenuItem, core::Speed)> =
@@ -317,7 +352,7 @@ impl Ui {
         let quit = MenuItem::new("", true, None);
         let sep = PredefinedMenuItem::separator();
         let items: [&dyn IsMenuItem; 16] = [
-            &header, &sep, &watch, &move_to, &sep, &delete, &speed, &estimate, &autostart, &sep, &lang, &sep, &log, &alias, &sep, &quit,
+            &header, &sep, &watch, move_or_sync, &sep, &delete, &speed, &estimate, &autostart, &sep, &lang, &sep, &log, &alias, &sep, &quit,
         ];
         for it in items {
             let _ = menu.append(it);
@@ -333,6 +368,8 @@ impl Ui {
             watch,
             move_to,
             move_items: Vec::new(),
+            sync_all,
+            move_shown,
             delete,
             speed,
             speeds,
@@ -388,6 +425,7 @@ impl Ui {
     fn set_texts(&mut self) {
         self.watch.set_text(self.t("menu_auto", &[]));
         self.move_to.set_text(self.t("menu_move", &[]));
+        self.sync_all.set_text(self.t("menu_sync_all", &[]));
         self.delete.set_text(self.t("menu_delete_copies", &[]));
         self.speed.set_text(self.t("menu_speed", &[]));
         for (item, s) in &self.speeds {
@@ -418,6 +456,7 @@ impl Ui {
     fn apply_info(&mut self, accounts: Result<Vec<Account>, String>, estimate: Option<Estimate>) {
         let settings = core::load_settings();
         self.delete.set_checked(!settings.keep_copies);
+        self.show_move(!settings.keep_copies);
         for (item, s) in &self.speeds {
             item.set_checked(*s == settings.speed);
         }
@@ -453,6 +492,19 @@ impl Ui {
                 let _ = self.move_to.append(&MenuItem::new(self.t("accounts_error", &[]), false, None));
             }
         }
+    }
+
+    /// Puts "move now" (copies deleted after sign-in) or "sync all accounts"
+    /// (copies kept) in the menu, right below auto sync.
+    fn show_move(&mut self, show: bool) {
+        if show == self.move_shown {
+            return;
+        }
+        let (old, new): (&dyn IsMenuItem, &dyn IsMenuItem) =
+            if show { (&self.sync_all, &self.move_to) } else { (&self.move_to, &self.sync_all) };
+        let _ = self.menu.remove(old);
+        let _ = self.menu.insert(new, MOVE_POS);
+        self.move_shown = show;
     }
 
     fn save(&self, key: &str, value: Value) -> bool {
@@ -571,7 +623,9 @@ pub fn run() {
                     ui.update_state();
                 } else if id == *ui.delete.id() {
                     let keep = core::load_settings().keep_copies;
-                    ui.save("keepCopies", json!(!keep));
+                    if ui.save("keepCopies", json!(!keep)) {
+                        ui.show_move(keep); // copies now deleted -> "move now"; kept -> "sync all"
+                    }
                     let _ = tx.send(Cmd::Refresh);
                 } else if let Some((_, s)) = ui.speeds.iter().find(|(i, _)| *i.id() == id) {
                     let s = *s;
@@ -598,6 +652,8 @@ pub fn run() {
                     if acc.signed_in || dialog("CCDC", &ui.t("move_confirm", &[]), true) {
                         let _ = tx.send(Cmd::Move(acc));
                     }
+                } else if id == *ui.sync_all.id() {
+                    let _ = tx.send(Cmd::SyncAll);
                 } else if id == *ui.log.id() {
                     platform::open_text_file(&platform::state_dir().join("watch.log"));
                 } else if id == *ui.alias.id() {
@@ -630,4 +686,24 @@ pub fn run() {
             _ => {}
         }
     });
+}
+
+// Windows only: macOS menus must be made on the main thread, which tests do not run on.
+#[cfg(all(test, windows))]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn move_now_and_sync_all_take_turns() {
+        let mut ui = Ui::new();
+        let ids = |ui: &Ui| ui.menu.items().iter().map(|i| i.id().clone()).collect::<Vec<_>>();
+        for show in [true, false, true, false, false] {
+            ui.show_move(show);
+            let ids = ids(&ui);
+            let (shown, hidden) = if show { (ui.move_to.id(), ui.sync_all.id()) } else { (ui.sync_all.id(), ui.move_to.id()) };
+            assert_eq!(&ids[MOVE_POS], shown);
+            assert!(!ids.contains(hidden));
+            assert_eq!(ids.len(), 16);
+        }
+    }
 }
