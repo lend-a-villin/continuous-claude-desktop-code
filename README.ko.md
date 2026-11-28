@@ -12,9 +12,9 @@ Claude 데스크톱 앱은 계정·조직마다 Code 세션 목록을 따로 관
 
 | 플랫폼 | 버전 | 상태 |
 | --- | --- | --- |
-| Windows | 1.0 | 새로 나왔습니다. Windows에서 실제 Claude 앱으로 시험해 설명대로 동작하는 것을 확인했습니다(0.3 스크립트 버전의 후속). |
-| macOS | 0.1 | 새로 나왔습니다. 아직 실제 Mac의 Claude 앱으로는 시험하지 않았습니다. |
-| Linux | 0.1 | 새로 나왔습니다. Debian 12, Ubuntu 24.04, Linux Mint 22에서 설치를 시험했지만, 실제 Claude 앱으로는 아직 시험하지 않았습니다. |
+| Windows | 1.1 | 새로 나왔습니다. Windows에서 실제 Claude 앱으로 시험해 설명대로 동작하는 것을 확인했습니다(0.3 스크립트 버전의 후속). |
+| macOS | 0.2 | 새로 나왔습니다. 아직 실제 Mac의 Claude 앱으로는 시험하지 않았습니다. |
+| Linux | 0.2 | 새로 나왔습니다. Debian 12, Ubuntu 24.04, Linux Mint 22에서 설치를 시험했지만, 실제 Claude 앱으로는 아직 시험하지 않았습니다. |
 
 ## 사용 대상
 
@@ -116,8 +116,10 @@ CCDC에는 해로운 코드가 없습니다. 인터넷에 연결하지 않고, �
 | 메뉴 | 동작 |
 | --- | --- |
 | 상태 줄 | CCDC가 로그인·로그아웃을 감시하고 있는지 보여 줍니다. |
+| 로그인 시각 줄 | 로그아웃된 계정마다 몇 시간 몇 분 전에 로그인했는지 한 줄씩 보여 줍니다(예: "2시간 13분 전 로그인"). Claude의 5시간 사용 한도를 짐작하는 데 씁니다. |
 | 자동 동기화 (로그인/로그아웃 감지) | 복사와 정리를 켜거나 끕니다. |
-| 계정으로 지금 옮기기 | 모든 세션을 한 계정의 폴더로 모읍니다. 그 계정이 로그인한 상태가 아니면 먼저 묻습니다. |
+| 계정으로 지금 옮기기 | "로그인 후 사본 삭제"가 켜져 있을 때 보입니다. 로그아웃 감지를 놓쳤을 때 씁니다. 모든 세션을 한 계정의 폴더로 모읍니다. 그 계정이 로그인한 상태가 아니면 먼저 묻습니다. |
+| 모든 계정 지금 동기화 | "로그인 후 사본 삭제"가 꺼져 있을 때 같은 자리에 보입니다. 로그아웃 감지를 놓쳤을 때 씁니다. 로그아웃할 때처럼 모든 세션을 모든 계정의 폴더로 복제합니다. |
 | 로그인 후 사본 삭제 | 기본값은 꺼짐입니다(사본을 남김, 위 설명 참고). |
 | 복사·삭제 속도 | 빠르게 (제한 없음), 보통 (60MB/s), 천천히 (15MB/s) 중에서 고릅니다. 보통과 천천히에서는 삭제도 각각 초당 500개, 100개로 제한됩니다. |
 | 예상 시간 줄 | 다음 로그아웃 때 복사에 걸릴 시간을 보여 줍니다. 사본을 삭제하도록 설정했다면 로그인 후 정리 시간도 함께 보여 줍니다. |
@@ -184,7 +186,7 @@ CCDC는 약 1MB 크기의 네이티브 프로그램 하나입니다. 대기 중�
 같은 프로그램을 터미널에서도 쓸 수 있습니다(Windows에서는 `%LOCALAPPDATA%\Programs\CCDC`의 `ccdc.exe`, macOS에서는 `/Applications/CCDC.app/Contents/MacOS/ccdc`).
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

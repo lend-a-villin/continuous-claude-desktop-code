@@ -12,9 +12,9 @@ Outil non officiel, non affilié à Anthropic et non approuvé par Anthropic.
 
 | Plateforme | Version | État |
 | --- | --- | --- |
-| Windows | 1.0 | Nouvelle ; testée avec la vraie application Claude sous Windows, où elle fonctionne comme décrit (prend la suite des scripts 0.3) |
-| macOS | 0.1 | Nouvelle ; pas encore testée avec la vraie application Claude sur un Mac |
-| Linux | 0.1 | Nouvelle ; installation testée sous Debian 12, Ubuntu 24.04 et Linux Mint 22, mais pas encore avec la vraie application Claude |
+| Windows | 1.1 | Nouvelle ; testée avec la vraie application Claude sous Windows, où elle fonctionne comme décrit (prend la suite des scripts 0.3) |
+| macOS | 0.2 | Nouvelle ; pas encore testée avec la vraie application Claude sur un Mac |
+| Linux | 0.2 | Nouvelle ; installation testée sous Debian 12, Ubuntu 24.04 et Linux Mint 22, mais pas encore avec la vraie application Claude |
 
 ## À qui s'adresse CCDC
 
@@ -116,8 +116,10 @@ Un **C** orange apparaît dans la zone de notification ou la barre des menus (gr
 | Élément du menu | Rôle |
 | --- | --- |
 | Ligne d'état | Indique si CCDC surveille les connexions et les déconnexions |
+| Lignes d'heure de connexion | Une ligne par compte déconnecté indiquant depuis combien de temps il s'est connecté (par ex. « connecté il y a 2 h 13 min »), pour estimer où il en est dans la fenêtre d'utilisation de 5 heures de Claude |
 | Synchronisation automatique (détecter connexion/déconnexion) | Active ou désactive la copie et le nettoyage |
-| Déplacer les sessions vers un compte maintenant | Regroupe toutes les sessions dans le dossier d'un compte ; demande confirmation si ce compte n'est pas connecté |
+| Déplacer les sessions vers un compte maintenant | Affiché quand « Supprimer les copies après la connexion » est activé. Pour une déconnexion non détectée : regroupe toutes les sessions dans le dossier d'un compte ; demande confirmation si ce compte n'est pas connecté |
+| Synchroniser tous les comptes maintenant | Affiché au même endroit quand « Supprimer les copies après la connexion » est désactivé. Pour une déconnexion non détectée : copie toutes les sessions dans le dossier de chaque compte, comme à la déconnexion |
 | Supprimer les copies après la connexion | Désactivé par défaut (les copies sont conservées ; voir plus haut) |
 | Vitesse de copie/suppression | Rapide (sans limite), Normale (60 Mo/s) ou Douce (15 Mo/s). La suppression est limitée à 500 fichiers par seconde en Normale et à 100 en Douce |
 | Ligne d'estimation | Indique la durée de la prochaine copie à la déconnexion et, si les copies sont supprimées, celle du nettoyage après la connexion |
@@ -184,7 +186,7 @@ La sortie de la ligne de commande et `watch.log` restent en anglais.
 Le même programme s'utilise aussi depuis un terminal (sous Windows, `ccdc.exe` dans `%LOCALAPPDATA%\Programs\CCDC` ; sous macOS, `/Applications/CCDC.app/Contents/MacOS/ccdc`) :
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

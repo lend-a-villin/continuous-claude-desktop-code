@@ -12,9 +12,9 @@ Narzędzie nieoficjalne, niepowiązane z firmą Anthropic ani przez nią niezatw
 
 | Platforma | Wersja | Stan |
 | --- | --- | --- |
-| Windows | 1.0 | Nowa; przetestowana z prawdziwą aplikacją Claude w systemie Windows, gdzie działa zgodnie z opisem (kontynuacja skryptów 0.3) |
-| macOS | 0.1 | Nowa; jeszcze nie testowana z prawdziwą aplikacją Claude na Macu |
-| Linux | 0.1 | Nowa; instalacja przetestowana w Debianie 12, Ubuntu 24.04 i Linux Mint 22, ale jeszcze nie z prawdziwą aplikacją Claude |
+| Windows | 1.1 | Nowa; przetestowana z prawdziwą aplikacją Claude w systemie Windows, gdzie działa zgodnie z opisem (kontynuacja skryptów 0.3) |
+| macOS | 0.2 | Nowa; jeszcze nie testowana z prawdziwą aplikacją Claude na Macu |
+| Linux | 0.2 | Nowa; instalacja przetestowana w Debianie 12, Ubuntu 24.04 i Linux Mint 22, ale jeszcze nie z prawdziwą aplikacją Claude |
 
 ## Dla kogo
 
@@ -116,8 +116,10 @@ W obszarze powiadomień lub na pasku menu pojawia się pomarańczowa litera **C*
 | Pozycja menu | Działanie |
 | --- | --- |
 | Wiersz stanu | Pokazuje, czy CCDC obserwuje logowania i wylogowania |
+| Wiersze czasu logowania | Po jednym wierszu na każde wylogowane konto z tym, ile czasu minęło od jego zalogowania (np. „zalogowano 2 godz. 13 min temu”), aby ocenić, gdzie jest w 5-godzinnym oknie limitu Claude |
 | Automatyczna synchronizacja (wykrywaj logowanie/wylogowanie) | Włącza lub wyłącza kopiowanie i porządki |
-| Przenieś sesje do konta teraz | Zbiera wszystkie sesje w folderze jednego konta; prosi o potwierdzenie, jeśli to konto nie jest zalogowane |
+| Przenieś sesje do konta teraz | Widoczne, gdy „Usuwaj kopie po zalogowaniu” jest włączone. Na wypadek niewykrytego wylogowania: zbiera wszystkie sesje w folderze jednego konta; prosi o potwierdzenie, jeśli to konto nie jest zalogowane |
+| Synchronizuj wszystkie konta teraz | Widoczne w tym samym miejscu, gdy „Usuwaj kopie po zalogowaniu” jest wyłączone. Na wypadek niewykrytego wylogowania: kopiuje wszystkie sesje do folderu każdego konta, tak jak przy wylogowaniu |
 | Usuwaj kopie po zalogowaniu | Domyślnie wyłączone (kopie zostają; zob. wyżej) |
 | Szybkość kopiowania/usuwania | Szybko (bez limitu), Normalnie (60 MB/s) lub Łagodnie (15 MB/s). W trybach „Normalnie” i „Łagodnie” usuwanie jest ograniczone do 500 i 100 plików na sekundę |
 | Wiersz szacunku | Pokazuje, ile potrwa kopiowanie przy następnym wylogowaniu, a jeśli kopie są usuwane, także porządki po zalogowaniu |
@@ -184,7 +186,7 @@ Dane wyjściowe wiersza poleceń i `watch.log` pozostają po angielsku.
 Ten sam program działa też w terminalu (w Windows to `ccdc.exe` w `%LOCALAPPDATA%\Programs\CCDC`, w macOS `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

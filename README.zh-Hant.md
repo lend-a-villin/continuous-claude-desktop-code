@@ -12,9 +12,9 @@ Claude 桌面版會依帳戶和組織，分別保存一份 Code 工作階段清�
 
 | 平台 | 版本 | 狀態 |
 | --- | --- | --- |
-| Windows | 1.0 | 新推出；已在 Windows 上搭配實際的 Claude 應用程式測試，運作符合說明（延續 0.3 版指令碼） |
-| macOS | 0.1 | 新推出；尚未在 Mac 上搭配實際的 Claude 應用程式測試 |
-| Linux | 0.1 | 新推出；已在 Debian 12、Ubuntu 24.04 和 Linux Mint 22 上完成安裝測試，尚未搭配實際的 Claude 應用程式測試 |
+| Windows | 1.1 | 新推出；已在 Windows 上搭配實際的 Claude 應用程式測試，運作符合說明（延續 0.3 版指令碼） |
+| macOS | 0.2 | 新推出；尚未在 Mac 上搭配實際的 Claude 應用程式測試 |
+| Linux | 0.2 | 新推出；已在 Debian 12、Ubuntu 24.04 和 Linux Mint 22 上完成安裝測試，尚未搭配實際的 Claude 應用程式測試 |
 
 ## 適用對象
 
@@ -116,8 +116,10 @@ CCDC 不含任何有害內容。它不會連上網際網路、不會收集資料
 | 選單項目 | 作用 |
 | --- | --- |
 | 狀態列 | 顯示 CCDC 是否正在監看登入與登出 |
+| 登入時間列 | 每個已登出的帳戶一列，顯示它多久之前登入（例如「2 小時 13 分鐘前登入」），方便估計它在 Claude 5 小時用量時段中的位置 |
 | 自動同步（偵測登入/登出） | 開啟或關閉複製與清理 |
-| 立即將工作階段移到帳戶 | 把所有工作階段集中到某個帳戶的資料夾；如果該帳戶未登入，會先詢問 |
+| 立即將工作階段移到帳戶 | 「登入後刪除副本」開啟時顯示。用於漏偵測登出時：把所有工作階段集中到某個帳戶的資料夾；如果該帳戶未登入，會先詢問 |
+| 立即同步所有帳戶 | 「登入後刪除副本」關閉時顯示在同一位置。用於漏偵測登出時：像登出時一樣，把所有工作階段複製到每個帳戶的資料夾 |
 | 登入後刪除副本 | 預設關閉（保留副本，見上文） |
 | 複製/刪除速度 | 可選「快（不限速）」「一般（60 MB/s）」或「慢（15 MB/s）」。刪除速度在「一般」和「慢」下分別限制為每秒 500 個和 100 個檔案 |
 | 預估時間列 | 顯示下次登出時複製大約需要多久；若設定為刪除副本，也會顯示登入後清理所需的時間 |
@@ -184,7 +186,7 @@ CCDC 是一個約 1 MB 的原生程式。等候期間，它每半秒只讀取 Cl
 同一個程式也可以在終端機中使用（Windows 上是 `%LOCALAPPDATA%\Programs\CCDC` 中的 `ccdc.exe`；macOS 上是 `/Applications/CCDC.app/Contents/MacOS/ccdc`）：
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

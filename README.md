@@ -12,9 +12,9 @@ Unofficial; not affiliated with or endorsed by Anthropic.
 
 | Platform | Version | Status |
 | --- | --- | --- |
-| Windows | 1.0 | New; tested with the real Claude app on Windows, where it works as described (continues from the 0.3 scripts) |
-| macOS | 0.1 | New; not yet tested with the real Claude app on a Mac |
-| Linux | 0.1 | New; install-tested on Debian 12, Ubuntu 24.04 and Linux Mint 22, not yet with the real Claude app |
+| Windows | 1.1 | New; tested with the real Claude app on Windows, where it works as described (continues from the 0.3 scripts) |
+| macOS | 0.2 | New; not yet tested with the real Claude app on a Mac |
+| Linux | 0.2 | New; install-tested on Debian 12, Ubuntu 24.04 and Linux Mint 22, not yet with the real Claude app |
 
 ## Who it is for
 
@@ -116,8 +116,10 @@ An orange **C** appears in the notification area or menu bar (gray while auto sy
 | Menu item | What it does |
 | --- | --- |
 | Status line | Shows whether CCDC is watching sign-ins and sign-outs |
+| Sign-in time lines | One line per signed-out account with how long ago it signed in (e.g. "signed in 2 h 13 min ago"), to help guess where it is in Claude's 5-hour usage window |
 | Auto sync (detect sign-in/sign-out) | Turns the copying and cleanup on or off |
-| Move sessions to account now | Gathers every session into one account's folder; asks first if that account is not signed in |
+| Move sessions to account now | Shown while "Delete copies after sign-in" is on. For when a sign-out was missed: gathers every session into one account's folder; asks first if that account is not signed in |
+| Sync all accounts now | Shown in the same place while "Delete copies after sign-in" is off. For when a sign-out was missed: copies every session into every account's folder, as a sign-out would |
 | Delete copies after sign-in | Off by default (copies are kept; see above) |
 | Copy/delete speed | Fast (no limit), Normal (60 MB/s) or Gentle (15 MB/s). Deleting is limited to 500 and 100 files per second at Normal and Gentle |
 | Estimate line | Shows how long the next sign-out copy would take and, if copies are deleted, the cleanup after sign-in |
@@ -184,7 +186,7 @@ Command-line output and `watch.log` stay in English.
 The same program also works from a terminal (on Windows, `ccdc.exe` in `%LOCALAPPDATA%\Programs\CCDC`; on macOS, `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

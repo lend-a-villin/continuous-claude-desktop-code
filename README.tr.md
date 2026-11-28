@@ -12,9 +12,9 @@ Resmî değildir; Anthropic ile bağlantılı değildir ve Anthropic tarafından
 
 | Platform | Sürüm | Durum |
 | --- | --- | --- |
-| Windows | 1.0 | Yeni; Windows'ta gerçek Claude uygulamasıyla denendi ve anlatıldığı gibi çalışıyor (0.3 betiklerinin devamıdır) |
-| macOS | 0.1 | Yeni; henüz bir Mac'te gerçek Claude uygulamasıyla denenmedi |
-| Linux | 0.1 | Yeni; kurulumu Debian 12, Ubuntu 24.04 ve Linux Mint 22'de denendi, gerçek Claude uygulamasıyla henüz denenmedi |
+| Windows | 1.1 | Yeni; Windows'ta gerçek Claude uygulamasıyla denendi ve anlatıldığı gibi çalışıyor (0.3 betiklerinin devamıdır) |
+| macOS | 0.2 | Yeni; henüz bir Mac'te gerçek Claude uygulamasıyla denenmedi |
+| Linux | 0.2 | Yeni; kurulumu Debian 12, Ubuntu 24.04 ve Linux Mint 22'de denendi, gerçek Claude uygulamasıyla henüz denenmedi |
 
 ## Kimin için
 
@@ -116,8 +116,10 @@ Bildirim alanında veya menü çubuğunda turuncu bir **C** görünür (otomatik
 | Menü öğesi | Ne yapar |
 | --- | --- |
 | Durum satırı | CCDC'nin oturum açma ve kapatmaları izleyip izlemediğini gösterir |
+| Oturum açma zamanı satırları | Oturumu kapalı her hesap için ne kadar önce oturum açtığını gösteren bir satır (örn. "2 sa 13 dk önce oturum açtı"); Claude'un 5 saatlik kullanım penceresinde nerede olduğunu tahmin etmeye yarar |
 | Otomatik eşitleme (oturum açma/kapatmayı algıla) | Kopyalamayı ve temizliği açar veya kapatır |
-| Oturumları şimdi bir hesaba taşı | Tüm oturumları tek bir hesabın klasöründe toplar; o hesapta oturum açık değilse önce sorar |
+| Oturumları şimdi bir hesaba taşı | "Oturum açıldıktan sonra kopyaları sil" açıkken görünür. Oturum kapatma kaçırıldığında kullanılır: tüm oturumları tek bir hesabın klasöründe toplar; o hesapta oturum açık değilse önce sorar |
+| Tüm hesapları şimdi eşitle | "Oturum açıldıktan sonra kopyaları sil" kapalıyken aynı yerde görünür. Oturum kapatma kaçırıldığında kullanılır: oturum kapatmadaki gibi tüm oturumları her hesabın klasörüne kopyalar |
 | Oturum açıldıktan sonra kopyaları sil | Varsayılan olarak kapalıdır (kopyalar tutulur; yukarıya bakın) |
 | Kopyalama/silme hızı | Hızlı (sınırsız), Normal (60 MB/sn) veya Yavaş (15 MB/sn). Normal ve Yavaş ayarlarında silme sırasıyla saniyede 500 ve 100 dosyayla sınırlıdır |
 | Tahmin satırı | Bir sonraki oturum kapatmada kopyalamanın ne kadar süreceğini, kopyalar siliniyorsa oturum açıldıktan sonraki temizliğin süresini de gösterir |
@@ -184,7 +186,7 @@ Komut satırı çıktısı ve `watch.log` İngilizce kalır.
 Aynı program terminalden de çalışır (Windows'ta `%LOCALAPPDATA%\Programs\CCDC` içindeki `ccdc.exe`; macOS'ta `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)
