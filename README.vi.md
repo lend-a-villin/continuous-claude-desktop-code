@@ -12,9 +12,9 @@ Công cụ không chính thức; không liên kết với Anthropic và không �
 
 | Nền tảng | Phiên bản | Trạng thái |
 | --- | --- | --- |
-| Windows | 1.0 | Mới; đã thử với ứng dụng Claude thật trên Windows và hoạt động như mô tả (kế tục các script 0.3) |
-| macOS | 0.1 | Mới; chưa thử với ứng dụng Claude thật trên máy Mac |
-| Linux | 0.1 | Mới; đã thử cài đặt trên Debian 12, Ubuntu 24.04 và Linux Mint 22, nhưng chưa thử với ứng dụng Claude thật |
+| Windows | 1.1 | Mới; đã thử với ứng dụng Claude thật trên Windows và hoạt động như mô tả (kế tục các script 0.3) |
+| macOS | 0.2 | Mới; chưa thử với ứng dụng Claude thật trên máy Mac |
+| Linux | 0.2 | Mới; đã thử cài đặt trên Debian 12, Ubuntu 24.04 và Linux Mint 22, nhưng chưa thử với ứng dụng Claude thật |
 
 ## Dành cho ai
 
@@ -116,8 +116,10 @@ Một chữ **C** màu cam xuất hiện trong vùng thông báo hoặc trên th
 | Mục menu | Chức năng |
 | --- | --- |
 | Dòng trạng thái | Cho biết CCDC có đang theo dõi đăng nhập và đăng xuất hay không |
+| Dòng thời điểm đăng nhập | Mỗi tài khoản đã đăng xuất một dòng cho biết đã đăng nhập bao lâu trước (ví dụ "đăng nhập 2 giờ 13 phút trước"), giúp ước đoán tài khoản đang ở đâu trong khung sử dụng 5 giờ của Claude |
 | Tự động đồng bộ (phát hiện đăng nhập/đăng xuất) | Bật hoặc tắt việc sao chép và dọn dẹp |
-| Chuyển phiên sang tài khoản ngay | Gom mọi phiên vào thư mục của một tài khoản; hỏi xác nhận nếu tài khoản đó chưa đăng nhập |
+| Chuyển phiên sang tài khoản ngay | Hiện khi "Xóa bản sao sau khi đăng nhập" bật. Dùng khi việc đăng xuất bị bỏ sót: gom mọi phiên vào thư mục của một tài khoản; hỏi xác nhận nếu tài khoản đó chưa đăng nhập |
+| Đồng bộ mọi tài khoản ngay | Hiện ở cùng vị trí khi "Xóa bản sao sau khi đăng nhập" tắt. Dùng khi việc đăng xuất bị bỏ sót: sao chép mọi phiên vào thư mục của mọi tài khoản, như khi đăng xuất |
 | Xóa bản sao sau khi đăng nhập | Mặc định tắt (bản sao được giữ; xem ở trên) |
 | Tốc độ sao chép/xóa | Nhanh (không giới hạn), Bình thường (60 MB/s) hoặc Nhẹ nhàng (15 MB/s). Ở mức Bình thường và Nhẹ nhàng, việc xóa được giới hạn lần lượt ở 500 và 100 tệp mỗi giây |
 | Dòng ước tính | Cho biết lần sao chép khi đăng xuất sắp tới sẽ mất bao lâu; nếu bật xóa bản sao, cho biết cả thời gian dọn dẹp sau khi đăng nhập |
@@ -184,7 +186,7 @@ Toàn bộ văn bản giao diện nằm trong một bảng duy nhất, [`locales
 Cùng một chương trình đó cũng dùng được từ terminal (trên Windows là `ccdc.exe` trong `%LOCALAPPDATA%\Programs\CCDC`; trên macOS là `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

@@ -12,9 +12,9 @@ Claude 桌面版按账户和组织分别保存 Code 会话列表。换一个账�
 
 | 平台 | 版本 | 状态 |
 | --- | --- | --- |
-| Windows | 1.0 | 新版本；已在 Windows 上配合真实的 Claude 应用测试，运行符合说明（接续 0.3 版脚本） |
-| macOS | 0.1 | 新版本；尚未在 Mac 上配合真实的 Claude 应用测试 |
-| Linux | 0.1 | 新版本；已在 Debian 12、Ubuntu 24.04 和 Linux Mint 22 上测试安装，尚未配合真实的 Claude 应用测试 |
+| Windows | 1.1 | 新版本；已在 Windows 上配合真实的 Claude 应用测试，运行符合说明（接续 0.3 版脚本） |
+| macOS | 0.2 | 新版本；尚未在 Mac 上配合真实的 Claude 应用测试 |
+| Linux | 0.2 | 新版本；已在 Debian 12、Ubuntu 24.04 和 Linux Mint 22 上测试安装，尚未配合真实的 Claude 应用测试 |
 
 ## 适用对象
 
@@ -116,8 +116,10 @@ CCDC 不含任何有害内容。它不联网、不收集数据，除了 Claude �
 | 菜单项 | 作用 |
 | --- | --- |
 | 状态行 | 显示 CCDC 是否正在监视登录和退出登录 |
+| 登录时间行 | 每个已退出登录的账户一行，显示它多久之前登录（例如“2 小时 13 分钟前登录”），便于估计它在 Claude 5 小时用量窗口中的位置 |
 | 自动同步（检测登录/退出登录） | 打开或关闭复制和清理 |
-| 立即将会话移到账户 | 把所有会话集中到某个账户的文件夹；该账户未登录时会先确认 |
+| 立即将会话移到账户 | “登录后删除副本”打开时显示。用于漏检退出登录时：把所有会话集中到某个账户的文件夹；该账户未登录时会先确认 |
+| 立即同步所有账户 | “登录后删除副本”关闭时显示在同一位置。用于漏检退出登录时：像退出登录时一样，把所有会话复制到每个账户的文件夹 |
 | 登录后删除副本 | 默认关闭（保留副本；见上文） |
 | 复制/删除速度 | 可选“快（不限速）”“普通（60 MB/s）”或“慢（15 MB/s）”。删除速度在“普通”和“慢”下分别限制为每秒 500 个和 100 个文件 |
 | 预计时间行 | 显示下次退出登录时复制大约需要多久；如果设置为删除副本，还会显示登录后清理所需的时间 |
@@ -184,7 +186,7 @@ CCDC 是一个约 1 MB 的原生程序。等待期间，它每半秒读取一次
 同一个程序也可以在终端中使用（Windows 上是 `%LOCALAPPDATA%\Programs\CCDC` 中的 `ccdc.exe`；macOS 上是 `/Applications/CCDC.app/Contents/MacOS/ccdc`）：
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

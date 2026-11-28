@@ -12,9 +12,9 @@ Strumento non ufficiale; non affiliato ad Anthropic né approvato da Anthropic.
 
 | Piattaforma | Versione | Stato |
 | --- | --- | --- |
-| Windows | 1.0 | Nuova; provata con la vera app Claude su Windows, dove funziona come descritto (prosegue gli script 0.3) |
-| macOS | 0.1 | Nuova; non ancora provata con la vera app Claude su un Mac |
-| Linux | 0.1 | Nuova; installazione provata su Debian 12, Ubuntu 24.04 e Linux Mint 22, non ancora con la vera app Claude |
+| Windows | 1.1 | Nuova; provata con la vera app Claude su Windows, dove funziona come descritto (prosegue gli script 0.3) |
+| macOS | 0.2 | Nuova; non ancora provata con la vera app Claude su un Mac |
+| Linux | 0.2 | Nuova; installazione provata su Debian 12, Ubuntu 24.04 e Linux Mint 22, non ancora con la vera app Claude |
 
 ## A chi è rivolto
 
@@ -116,8 +116,10 @@ Nell'area di notifica o nella barra dei menu compare una **C** arancione (grigia
 | Voce di menu | Cosa fa |
 | --- | --- |
 | Riga di stato | Indica se CCDC sta controllando accessi e disconnessioni |
+| Righe dell'ora di accesso | Una riga per ogni account disconnesso con quanto tempo fa ha effettuato l'accesso (es. "accesso 2 h 13 min fa"), per stimare a che punto è nella finestra di utilizzo di 5 ore di Claude |
 | Sincronizzazione automatica (rileva accesso/disconnessione) | Attiva o disattiva la copia e la pulizia |
-| Sposta ora le sessioni in un account | Raccoglie tutte le sessioni nella cartella di un account; chiede conferma se quell'account non è connesso |
+| Sposta ora le sessioni in un account | Compare quando "Elimina le copie dopo l'accesso" è attivo. Per una disconnessione non rilevata: raccoglie tutte le sessioni nella cartella di un account; chiede conferma se quell'account non è connesso |
+| Sincronizza ora tutti gli account | Compare nello stesso punto quando "Elimina le copie dopo l'accesso" è disattivato. Per una disconnessione non rilevata: copia tutte le sessioni nella cartella di ogni account, come alla disconnessione |
 | Elimina le copie dopo l'accesso | Disattivata per impostazione predefinita (le copie si conservano; vedi sopra) |
 | Velocità di copia/eliminazione | Veloce (nessun limite), Normale (60 MB/s) o Lenta (15 MB/s). Con Normale e Lenta l'eliminazione è limitata rispettivamente a 500 e 100 file al secondo |
 | Riga di stima | Indica quanto richiederebbe la prossima copia alla disconnessione e, se le copie vengono eliminate, anche la pulizia dopo l'accesso |
@@ -184,7 +186,7 @@ L'output della riga di comando e `watch.log` restano in inglese.
 Lo stesso programma funziona anche da terminale (su Windows è `ccdc.exe` in `%LOCALAPPDATA%\Programs\CCDC`; su macOS è `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

@@ -12,9 +12,9 @@ Inoffiziell; steht in keiner Verbindung zu Anthropic und wird nicht von Anthropi
 
 | Plattform | Version | Status |
 | --- | --- | --- |
-| Windows | 1.0 | Neu; mit der echten Claude-App unter Windows getestet und funktioniert wie beschrieben (Nachfolger der 0.3-Skripte) |
-| macOS | 0.1 | Neu; noch nicht mit der echten Claude-App auf einem Mac getestet |
-| Linux | 0.1 | Neu; Installation unter Debian 12, Ubuntu 24.04 und Linux Mint 22 getestet, noch nicht mit der echten Claude-App |
+| Windows | 1.1 | Neu; mit der echten Claude-App unter Windows getestet und funktioniert wie beschrieben (Nachfolger der 0.3-Skripte) |
+| macOS | 0.2 | Neu; noch nicht mit der echten Claude-App auf einem Mac getestet |
+| Linux | 0.2 | Neu; Installation unter Debian 12, Ubuntu 24.04 und Linux Mint 22 getestet, noch nicht mit der echten Claude-App |
 
 ## Für wen CCDC gedacht ist
 
@@ -116,8 +116,10 @@ Im Infobereich bzw. in der Menüleiste erscheint ein orangefarbenes **C** (grau,
 | Menüeintrag | Funktion |
 | --- | --- |
 | Statuszeile | Zeigt, ob CCDC An- und Abmeldungen überwacht |
+| Anmeldezeit-Zeilen | Eine Zeile pro abgemeldetem Konto, wie lange seine Anmeldung her ist (z. B. „vor 2 Std. 13 Min. angemeldet“), um abzuschätzen, wo es im 5-Stunden-Nutzungsfenster von Claude steht |
 | Automatische Synchronisierung (An-/Abmeldung erkennen) | Schaltet das Kopieren und Aufräumen ein oder aus |
-| Sitzungen jetzt in ein Konto verschieben | Sammelt alle Sitzungen im Ordner eines Kontos; fragt vorher nach, wenn dieses Konto nicht angemeldet ist |
+| Sitzungen jetzt in ein Konto verschieben | Erscheint, wenn „Kopien nach der Anmeldung löschen“ eingeschaltet ist. Für eine nicht erkannte Abmeldung: Sammelt alle Sitzungen im Ordner eines Kontos; fragt vorher nach, wenn dieses Konto nicht angemeldet ist |
+| Alle Konten jetzt synchronisieren | Erscheint an derselben Stelle, wenn „Kopien nach der Anmeldung löschen“ ausgeschaltet ist. Für eine nicht erkannte Abmeldung: kopiert alle Sitzungen in den Ordner jedes Kontos, wie bei einer Abmeldung |
 | Kopien nach der Anmeldung löschen | Standardmäßig aus (Kopien bleiben erhalten; siehe oben) |
 | Kopier-/Löschgeschwindigkeit | Schnell (ohne Grenze), Normal (60 MB/s) oder Schonend (15 MB/s). Bei Normal und Schonend ist das Löschen auf 500 bzw. 100 Dateien pro Sekunde begrenzt |
 | Schätzzeile | Zeigt, wie lange das nächste Kopieren bei der Abmeldung dauern würde und, falls Kopien gelöscht werden, auch das Aufräumen nach der Anmeldung |
@@ -184,7 +186,7 @@ Die Ausgabe der Befehlszeile und `watch.log` bleiben auf Englisch.
 Dasselbe Programm lässt sich auch im Terminal verwenden (unter Windows `ccdc.exe` in `%LOCALAPPDATA%\Programs\CCDC`, unter macOS `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

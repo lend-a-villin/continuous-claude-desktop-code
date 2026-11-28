@@ -12,9 +12,9 @@ Claude デスクトップアプリは、アカウント・組織ごとに別々�
 
 | プラットフォーム | バージョン | 状態 |
 | --- | --- | --- |
-| Windows | 1.0 | 新しい版です。Windows 上の実際の Claude アプリでテストし、説明どおりに動作することを確認しました (0.3 のスクリプト版の後継です) |
-| macOS | 0.1 | 新しい版です。Mac 上の実際の Claude アプリではまだテストしていません |
-| Linux | 0.1 | 新しい版です。Debian 12、Ubuntu 24.04、Linux Mint 22 でインストールを確認済みですが、実際の Claude アプリではまだテストしていません |
+| Windows | 1.1 | 新しい版です。Windows 上の実際の Claude アプリでテストし、説明どおりに動作することを確認しました (0.3 のスクリプト版の後継です) |
+| macOS | 0.2 | 新しい版です。Mac 上の実際の Claude アプリではまだテストしていません |
+| Linux | 0.2 | 新しい版です。Debian 12、Ubuntu 24.04、Linux Mint 22 でインストールを確認済みですが、実際の Claude アプリではまだテストしていません |
 
 ## 対象
 
@@ -116,8 +116,10 @@ CCDC に有害なものは含まれていません。インターネットに接
 | メニュー項目 | 動作 |
 | --- | --- |
 | 状態の行 | CCDC がサインインとサインアウトを監視しているかどうかを表示します |
+| サインイン時刻の行 | サインアウト中のアカウントごとに、何時間何分前にサインインしたかを 1 行ずつ表示します (例: 「2 時間 13 分前にサインイン」)。Claude の 5 時間の利用枠の目安になります |
 | 自動同期 (サインイン/サインアウトを検出) | コピーと整理をオン/オフします |
-| 今すぐアカウントへ移動 | すべてのセッションを 1 つのアカウントのフォルダーに集めます。サインインしていないアカウントを選ぶと、先に確認します |
+| 今すぐアカウントへ移動 | 「サインイン後にコピーを削除」がオンのときに表示されます。サインアウトの検出に失敗したときに使います。すべてのセッションを 1 つのアカウントのフォルダーに集めます。サインインしていないアカウントを選ぶと、先に確認します |
+| 今すぐすべてのアカウントを同期 | 「サインイン後にコピーを削除」がオフのときに同じ位置に表示されます。サインアウトの検出に失敗したときに使います。サインアウト時と同じように、すべてのセッションをすべてのアカウントのフォルダーにコピーします |
 | サインイン後にコピーを削除 | 既定ではオフです (コピーを残します。上記を参照) |
 | コピー・削除の速度 | 「速い (制限なし)」「標準 (60 MB/s)」「ゆっくり (15 MB/s)」から選びます。削除は「標準」で毎秒 500 ファイル、「ゆっくり」で毎秒 100 ファイルまでに制限されます |
 | 予想時間の行 | 次のサインアウト時のコピーにかかる時間を表示します。コピーを削除する設定の場合は、サインイン後の整理にかかる時間も表示します |
@@ -184,7 +186,7 @@ UI の文言はすべて 1 枚のシート [`locales.csv`](locales.csv) にあ�
 同じプログラムはターミナルからも使えます (Windows では `%LOCALAPPDATA%\Programs\CCDC` にある `ccdc.exe`、macOS では `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

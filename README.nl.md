@@ -12,9 +12,9 @@ Onofficieel; niet verbonden aan of goedgekeurd door Anthropic.
 
 | Platform | Versie | Status |
 | --- | --- | --- |
-| Windows | 1.0 | Nieuw; getest met de echte Claude-app op Windows, waar hij werkt zoals beschreven (opvolger van de 0.3-scripts) |
-| macOS | 0.1 | Nieuw; nog niet getest met de echte Claude-app op een Mac |
-| Linux | 0.1 | Nieuw; installatie getest op Debian 12, Ubuntu 24.04 en Linux Mint 22, nog niet met de echte Claude-app |
+| Windows | 1.1 | Nieuw; getest met de echte Claude-app op Windows, waar hij werkt zoals beschreven (opvolger van de 0.3-scripts) |
+| macOS | 0.2 | Nieuw; nog niet getest met de echte Claude-app op een Mac |
+| Linux | 0.2 | Nieuw; installatie getest op Debian 12, Ubuntu 24.04 en Linux Mint 22, nog niet met de echte Claude-app |
 
 ## Voor wie CCDC bedoeld is
 
@@ -116,8 +116,10 @@ In het systeemvak of de menubalk verschijnt een oranje **C** (grijs zolang autom
 | Menu-item | Wat het doet |
 | --- | --- |
 | Statusregel | Toont of CCDC aan- en afmeldingen bewaakt |
+| Regels met aanmeldtijd | Eén regel per afgemeld account met hoe lang geleden het zich aanmeldde (bijv. "2 u 13 min geleden aangemeld"), om in te schatten waar het staat in het gebruiksvenster van 5 uur van Claude |
 | Automatische synchronisatie (aan-/afmelden detecteren) | Zet het kopiëren en opruimen aan of uit |
-| Sessies nu naar een account verplaatsen | Verzamelt alle sessies in de map van één account; vraagt eerst om bevestiging als dat account niet is aangemeld |
+| Sessies nu naar een account verplaatsen | Zichtbaar als "Kopieën verwijderen na aanmelden" aan staat. Voor als een afmelding is gemist: verzamelt alle sessies in de map van één account; vraagt eerst om bevestiging als dat account niet is aangemeld |
+| Alle accounts nu synchroniseren | Zichtbaar op dezelfde plek als "Kopieën verwijderen na aanmelden" uit staat. Voor als een afmelding is gemist: kopieert alle sessies naar de map van elk account, net als bij afmelden |
 | Kopieën verwijderen na aanmelden | Standaard uit (de kopieën blijven bewaard; zie hierboven) |
 | Snelheid van kopiëren/verwijderen | Snel (geen limiet), Normaal (60 MB/s) of Rustig (15 MB/s). Bij Normaal en Rustig is verwijderen beperkt tot respectievelijk 500 en 100 bestanden per seconde |
 | Schattingsregel | Toont hoe lang het kopiëren bij de volgende afmelding zou duren en, als kopieën worden verwijderd, ook het opruimen na aanmelden |
@@ -184,7 +186,7 @@ De uitvoer van de opdrachtregel en `watch.log` blijven in het Engels.
 Hetzelfde programma werkt ook vanuit een terminal (op Windows `ccdc.exe` in `%LOCALAPPDATA%\Programs\CCDC`; op macOS `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

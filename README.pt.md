@@ -12,9 +12,9 @@ Não oficial; não é afiliado nem endossado pela Anthropic.
 
 | Plataforma | Versão | Situação |
 | --- | --- | --- |
-| Windows | 1.0 | Nova; testada com o aplicativo Claude real no Windows, onde funciona como descrito (sucessora dos scripts da 0.3) |
-| macOS | 0.1 | Nova; ainda não testada com o aplicativo Claude real em um Mac |
-| Linux | 0.1 | Nova; instalação testada no Debian 12, Ubuntu 24.04 e Linux Mint 22, ainda não com o aplicativo Claude real |
+| Windows | 1.1 | Nova; testada com o aplicativo Claude real no Windows, onde funciona como descrito (sucessora dos scripts da 0.3) |
+| macOS | 0.2 | Nova; ainda não testada com o aplicativo Claude real em um Mac |
+| Linux | 0.2 | Nova; instalação testada no Debian 12, Ubuntu 24.04 e Linux Mint 22, ainda não com o aplicativo Claude real |
 
 ## Para quem é
 
@@ -116,8 +116,10 @@ Um **C** laranja aparece na área de notificação ou na barra de menus (cinza e
 | Item do menu | O que faz |
 | --- | --- |
 | Linha de status | Mostra se o CCDC está monitorando logins e logouts |
+| Linhas de hora de login | Uma linha por conta desconectada com há quanto tempo ela fez login (ex.: "login há 2 h 13 min"), para estimar em que ponto ela está na janela de uso de 5 horas do Claude |
 | Sincronização automática (detectar login/logout) | Ativa ou desativa a cópia e a limpeza |
-| Mover sessões para uma conta agora | Reúne todas as sessões na pasta de uma conta; pergunta antes se essa conta não estiver conectada |
+| Mover sessões para uma conta agora | Aparece quando "Excluir as cópias após o login" está ativado. Para quando um logout não foi detectado: reúne todas as sessões na pasta de uma conta; pergunta antes se essa conta não estiver conectada |
+| Sincronizar todas as contas agora | Aparece no mesmo lugar quando "Excluir as cópias após o login" está desativado. Para quando um logout não foi detectado: copia todas as sessões para a pasta de cada conta, como no logout |
 | Excluir as cópias após o login | Desativado por padrão (as cópias são mantidas; veja acima) |
 | Velocidade de cópia/exclusão | Rápida (sem limite), Normal (60 MB/s) ou Lenta (15 MB/s). Em Normal e Lenta, a exclusão é limitada a 500 e 100 arquivos por segundo, respectivamente |
 | Linha de estimativa | Mostra quanto levaria a cópia no próximo logout e, se as cópias forem excluídas, também a limpeza após o login |
@@ -184,7 +186,7 @@ A saída da linha de comando e o `watch.log` ficam em inglês.
 O mesmo programa também funciona em um terminal (no Windows, `ccdc.exe` em `%LOCALAPPDATA%\Programs\CCDC`; no macOS, `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

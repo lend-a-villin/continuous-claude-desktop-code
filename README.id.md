@@ -12,9 +12,9 @@ Tidak resmi; tidak berafiliasi dengan dan tidak didukung oleh Anthropic.
 
 | Platform | Versi | Status |
 | --- | --- | --- |
-| Windows | 1.0 | Baru; sudah diuji dengan aplikasi Claude sungguhan di Windows dan berfungsi seperti yang dijelaskan (lanjutan dari skrip 0.3) |
-| macOS | 0.1 | Baru; belum diuji dengan aplikasi Claude sungguhan di Mac |
-| Linux | 0.1 | Baru; instalasinya sudah diuji di Debian 12, Ubuntu 24.04, dan Linux Mint 22, tetapi belum dengan aplikasi Claude sungguhan |
+| Windows | 1.1 | Baru; sudah diuji dengan aplikasi Claude sungguhan di Windows dan berfungsi seperti yang dijelaskan (lanjutan dari skrip 0.3) |
+| macOS | 0.2 | Baru; belum diuji dengan aplikasi Claude sungguhan di Mac |
+| Linux | 0.2 | Baru; instalasinya sudah diuji di Debian 12, Ubuntu 24.04, dan Linux Mint 22, tetapi belum dengan aplikasi Claude sungguhan |
 
 ## Untuk siapa
 
@@ -116,8 +116,10 @@ Ikon **C** oranye muncul di area notifikasi atau bilah menu (abu-abu saat sinkro
 | Item menu | Fungsi |
 | --- | --- |
 | Baris status | Menunjukkan apakah CCDC sedang memantau masuk dan keluar akun |
+| Baris waktu masuk | Satu baris untuk tiap akun yang sedang keluar, berisi berapa lama lalu akun itu masuk (mis. "masuk 2 jam 13 menit lalu"), untuk memperkirakan posisinya dalam jendela penggunaan 5 jam Claude |
 | Sinkronisasi otomatis (deteksi masuk/keluar akun) | Mengaktifkan atau menonaktifkan penyalinan dan pembersihan |
-| Pindahkan sesi ke akun sekarang | Mengumpulkan semua sesi ke folder satu akun; bertanya dulu jika akun itu tidak sedang masuk |
+| Pindahkan sesi ke akun sekarang | Muncul saat "Hapus salinan setelah masuk" aktif. Untuk saat keluar akun tidak terdeteksi: mengumpulkan semua sesi ke folder satu akun; bertanya dulu jika akun itu tidak sedang masuk |
+| Sinkronkan semua akun sekarang | Muncul di tempat yang sama saat "Hapus salinan setelah masuk" nonaktif. Untuk saat keluar akun tidak terdeteksi: menyalin semua sesi ke folder setiap akun, seperti saat keluar akun |
 | Hapus salinan setelah masuk | Nonaktif secara bawaan (salinan dipertahankan; lihat di atas) |
 | Kecepatan salin/hapus | Cepat (tanpa batas), Normal (60 MB/dtk), atau Pelan (15 MB/dtk). Pada Normal dan Pelan, penghapusan dibatasi masing-masing 500 dan 100 file per detik |
 | Baris perkiraan | Menunjukkan berapa lama penyalinan saat keluar akun berikutnya, serta lama pembersihan setelah masuk jika salinan dihapus |
@@ -184,7 +186,7 @@ Keluaran baris perintah dan `watch.log` tetap dalam bahasa Inggris.
 Program yang sama juga bisa dipakai dari terminal (di Windows, `ccdc.exe` di `%LOCALAPPDATA%\Programs\CCDC`; di macOS, `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)

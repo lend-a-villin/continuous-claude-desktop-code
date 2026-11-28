@@ -12,9 +12,9 @@ Herramienta no oficial; no está afiliada a Anthropic ni cuenta con su respaldo.
 
 | Plataforma | Versión | Estado |
 | --- | --- | --- |
-| Windows | 1.0 | Nueva; probada con la aplicación real de Claude en Windows, donde funciona como se describe (continuación de los scripts 0.3) |
-| macOS | 0.1 | Nueva; aún no se ha probado con la aplicación real de Claude en un Mac |
-| Linux | 0.1 | Nueva; instalación probada en Debian 12, Ubuntu 24.04 y Linux Mint 22, pero aún no con la aplicación real de Claude |
+| Windows | 1.1 | Nueva; probada con la aplicación real de Claude en Windows, donde funciona como se describe (continuación de los scripts 0.3) |
+| macOS | 0.2 | Nueva; aún no se ha probado con la aplicación real de Claude en un Mac |
+| Linux | 0.2 | Nueva; instalación probada en Debian 12, Ubuntu 24.04 y Linux Mint 22, pero aún no con la aplicación real de Claude |
 
 ## Para quién es
 
@@ -116,8 +116,10 @@ Aparece una **C** naranja en el área de notificación o en la barra de menús (
 | Elemento del menú | Qué hace |
 | --- | --- |
 | Línea de estado | Indica si CCDC está vigilando los inicios y cierres de sesión |
+| Líneas de hora de inicio de sesión | Una línea por cada cuenta sin sesión iniciada con cuánto hace que inició sesión (p. ej., "inició sesión hace 2 h 13 min"), para estimar en qué punto está de la ventana de uso de 5 horas de Claude |
 | Sincronización automática (detectar inicio/cierre de sesión) | Activa o desactiva la copia y la limpieza |
-| Mover las sesiones a una cuenta ahora | Reúne todas las sesiones en la carpeta de una cuenta; pide confirmación primero si esa cuenta no tiene la sesión iniciada |
+| Mover las sesiones a una cuenta ahora | Aparece cuando "Eliminar las copias tras iniciar sesión" está activado. Para cuando no se detectó un cierre de sesión: reúne todas las sesiones en la carpeta de una cuenta; pide confirmación primero si esa cuenta no tiene la sesión iniciada |
+| Sincronizar todas las cuentas ahora | Aparece en el mismo lugar cuando "Eliminar las copias tras iniciar sesión" está desactivado. Para cuando no se detectó un cierre de sesión: copia todas las sesiones a la carpeta de cada cuenta, igual que al cerrar sesión |
 | Eliminar las copias tras iniciar sesión | Desactivado por defecto (las copias se conservan; ver arriba) |
 | Velocidad de copia/eliminación | Rápida (sin límite), Normal (60 MB/s) o Suave (15 MB/s). En Normal y Suave, la eliminación se limita a 500 y 100 archivos por segundo, respectivamente |
 | Línea de estimación | Muestra cuánto tardaría la copia en el próximo cierre de sesión y, si se eliminan las copias, también la limpieza tras el inicio de sesión |
@@ -184,7 +186,7 @@ La salida de la línea de comandos y `watch.log` se quedan en inglés.
 El mismo programa también funciona desde un terminal (en Windows, `ccdc.exe` en `%LOCALAPPDATA%\Programs\CCDC`; en macOS, `/Applications/CCDC.app/Contents/MacOS/ccdc`):
 
 ```sh
-ccdc status               # app state, settings, sessions per folder, free disk
+ccdc status               # app state, settings, sessions per folder, last sign-in times, free disk
 ccdc estimate             # how long the next sign-out copy / sign-in cleanup would take
 ccdc replicate --dry-run  # what a sign-out copy would write right now
 ccdc move [--to <acct>]   # gather every session into one account's folder (first 8 characters of the ID are enough)
