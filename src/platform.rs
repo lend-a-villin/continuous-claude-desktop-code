@@ -115,20 +115,44 @@ pub fn free_bytes(dir: &Path) -> u64 {
 
 // ---------- time (no date library needed) ----------
 
-pub fn local_time() -> String {
+/// Local date and time now: [year, month, day, hour, minute, second].
+fn local_now() -> [i64; 6] {
     #[cfg(windows)]
     {
         let mut t = unsafe { std::mem::zeroed::<windows_sys::Win32::Foundation::SYSTEMTIME>() };
         unsafe { windows_sys::Win32::System::SystemInformation::GetLocalTime(&mut t) };
-        format!("{:02}:{:02}:{:02}", t.wHour, t.wMinute, t.wSecond)
+        [t.wYear, t.wMonth, t.wDay, t.wHour, t.wMinute, t.wSecond].map(i64::from)
     }
     #[cfg(not(windows))]
     {
         let now = unsafe { libc::time(std::ptr::null_mut()) };
         let mut tm: libc::tm = unsafe { std::mem::zeroed() };
         unsafe { libc::localtime_r(&now, &mut tm) };
-        format!("{:02}:{:02}:{:02}", tm.tm_hour, tm.tm_min, tm.tm_sec)
+        [tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec].map(i64::from)
     }
+}
+
+pub fn local_time() -> String {
+    let [_, _, _, h, m, s] = local_now();
+    format!("{h:02}:{m:02}:{s:02}")
+}
+
+/// A local date and time as seconds on one scale, for working out how long ago it was.
+pub fn civil_secs(y: i64, m: i64, d: i64, hour: i64, min: i64, sec: i64) -> i64 {
+    // days since 1970-01-01 from a civil date (Howard Hinnant's algorithm)
+    let y = if m <= 2 { y - 1 } else { y };
+    let era = y.div_euclid(400);
+    let yoe = y - era * 400;
+    let doy = (153 * ((m + 9) % 12) + 2) / 5 + d - 1;
+    let doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    let days = era * 146_097 + doe - 719_468;
+    days * 86400 + hour * 3600 + min * 60 + sec
+}
+
+/// Now, on the same scale as `civil_secs`.
+pub fn local_now_secs() -> i64 {
+    let [y, mo, d, h, mi, s] = local_now();
+    civil_secs(y, mo, d, h, mi, s)
 }
 
 /// 2026-11-26T02-58-39-123Z style name for backup folders.
@@ -392,5 +416,8 @@ mod tests {
     fn stamps() {
         assert_eq!(super::utc_stamp(0, 0), "1970-01-01T00-00-00-000Z");
         assert_eq!(super::utc_stamp(1_795_651_200, 5), "2026-11-26T00-00-00-005Z");
+        assert_eq!(super::civil_secs(1970, 1, 1, 0, 0, 0), 0);
+        assert_eq!(super::civil_secs(2026, 11, 26, 0, 0, 0), 1_795_651_200);
+        assert_eq!(super::civil_secs(2024, 3, 1, 0, 0, 0) - super::civil_secs(2024, 2, 28, 23, 0, 0), 25 * 3600);
     }
 }

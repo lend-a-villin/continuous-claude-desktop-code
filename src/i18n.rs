@@ -130,6 +130,14 @@ mod tests {
         assert!(s.languages.len() >= 20);
         assert_eq!(s.t("speed_normal", &[]), "보통 (60MB/s)");
         assert!(s.t("ev_copy_done", &[&3, &"1.2"]).contains('3'));
+        assert_eq!(s.t("menu_sync_all", &[]), "모든 계정 지금 동기화");
+        // every language has every message (no silent fall back to English)
+        for (code, _) in &s.languages {
+            let row = &s.rows[&code.to_lowercase()];
+            for key in ["menu_sync_all", "sync_start", "sync_done", "sync_nothing", "last_signin", "last_signin_days"] {
+                assert!(row.get(key).is_some_and(|v| !v.is_empty()), "{code}: {key}");
+            }
+        }
     }
 
     #[test]

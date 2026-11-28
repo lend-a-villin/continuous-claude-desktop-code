@@ -94,13 +94,19 @@ fn cmd_status(a: &Args) -> Result<(), String> {
         settings.speed.key(),
         if settings.keep_copies { "keep copies" } else { "remove copies after sign-in" }
     );
+    let ago = log.as_deref().map(|p| core::SignIns::new(p).ago()).unwrap_or_default();
     for l in &s.leaves {
         let live = matches!(&st, Some(core::LogEvent::SignedIn { account, org }) if *account == l.account && *org == l.org);
+        let signed_in = match ago.get(&l.account) {
+            Some(secs) => format!("  signed in {}h {:02}m ago", secs / 3600, secs % 3600 / 60),
+            None => String::new(),
+        };
         println!(
-            "  {} / {}  sessions={}{}",
+            "  {} / {}  sessions={}{}{}",
             core::short(&l.account),
             core::short(&l.org),
             l.sessions.len(),
+            signed_in,
             if live { "  <- in use" } else { "" }
         );
     }
